@@ -1,0 +1,208 @@
+{
+ "seed": 20261122,
+ "group_unit": "recording file",
+ "classes": [
+  "background",
+  "climbing",
+  "digging",
+  "other",
+  "running",
+  "tampering",
+  "vehicle",
+  "walking"
+ ],
+ "evaluable_classes": [
+  "climbing",
+  "other",
+  "vehicle",
+  "walking"
+ ],
+ "not_evaluable_on_brno": {
+  "background": "1 recording",
+  "digging": "1 recording",
+  "running": "1 recording",
+  "tampering": "1 recording"
+ },
+ "locked_test": [
+  "fence_2023-04-17T123117+0100",
+  "longboard_2023-04-17T123543+0100",
+  "auto4_2023-06-06T144655+0100",
+  "walking_2023-04-17T121933+0100"
+ ],
+ "locked_test_class": {
+  "fence_2023-04-17T123117+0100": "climbing",
+  "longboard_2023-04-17T123543+0100": "other",
+  "auto4_2023-06-06T144655+0100": "vehicle",
+  "walking_2023-04-17T121933+0100": "walking"
+ },
+ "development": [
+  "auto2_2023-04-17T124510+0100",
+  "auto4_2023-06-06T145055+0100",
+  "auto_2023-04-17T124152+0100",
+  "reconstruction1_2023-06-06T150714+0100",
+  "kopani_plot_2023-11-07T150207Z",
+  "plot_2023-11-07T150119Z",
+  "longboardroad_2023-04-17T123638+0100",
+  "manipulation_2023-04-17T122847+0100",
+  "openingclosing_2023-04-17T122658+0100",
+  "regularshit_2023-04-17T130103+0100",
+  "running_2023-04-17T122413+0100",
+  "walking2_2023-04-17T122153+0100"
+ ],
+ "development_folds": {
+  "0": [
+   "regularshit_2023-04-17T130103+0100",
+   "openingclosing_2023-04-17T122658+0100",
+   "auto2_2023-04-17T124510+0100"
+  ],
+  "1": [
+   "plot_2023-11-07T150119Z",
+   "running_2023-04-17T122413+0100",
+   "walking2_2023-04-17T122153+0100"
+  ],
+  "2": [
+   "kopani_plot_2023-11-07T150207Z",
+   "manipulation_2023-04-17T122847+0100"
+  ],
+  "3": [
+   "reconstruction1_2023-06-06T150714+0100",
+   "auto_2023-04-17T124152+0100"
+  ],
+  "4": [
+   "longboardroad_2023-04-17T123638+0100",
+   "auto4_2023-06-06T145055+0100"
+  ]
+ },
+ "recordings": [
+  {
+   "name": "auto2_2023-04-17T124510+0100",
+   "folder": "car",
+   "class": "vehicle",
+   "date": "2023-04-17",
+   "n_events_annotated": 5
+  },
+  {
+   "name": "auto4_2023-06-06T144655+0100",
+   "folder": "car",
+   "class": "vehicle",
+   "date": "2023-06-06",
+   "n_events_annotated": 2
+  },
+  {
+   "name": "auto4_2023-06-06T145055+0100",
+   "folder": "car",
+   "class": "vehicle",
+   "date": "2023-06-06",
+   "n_events_annotated": 6
+  },
+  {
+   "name": "auto_2023-04-17T124152+0100",
+   "folder": "car",
+   "class": "vehicle",
+   "date": "2023-04-17",
+   "n_events_annotated": 5
+  },
+  {
+   "name": "reconstruction1_2023-06-06T150714+0100",
+   "folder": "construction",
+   "class": "digging",
+   "date": "2023-06-06",
+   "n_events_annotated": 2
+  },
+  {
+   "name": "fence_2023-04-17T123117+0100",
+   "folder": "fence",
+   "class": "climbing",
+   "date": "2023-04-17",
+   "n_events_annotated": 12
+  },
+  {
+   "name": "kopani_plot_2023-11-07T150207Z",
+   "folder": "fence",
+   "class": "climbing",
+   "date": "2023-11-07",
+   "n_events_annotated": 1
+  },
+  {
+   "name": "plot_2023-11-07T150119Z",
+   "folder": "fence",
+   "class": "climbing",
+   "date": "2023-11-07",
+   "n_events_annotated": 1
+  },
+  {
+   "name": "longboard_2023-04-17T123543+0100",
+   "folder": "longboard",
+   "class": "other",
+   "date": "2023-04-17",
+   "n_events_annotated": 3
+  },
+  {
+   "name": "longboardroad_2023-04-17T123638+0100",
+   "folder": "longboard",
+   "class": "other",
+   "date": "2023-04-17",
+   "n_events_annotated": 9
+  },
+  {
+   "name": "manipulation_2023-04-17T122847+0100",
+   "folder": "manipulation",
+   "class": "tampering",
+   "date": "2023-04-17",
+   "n_events_annotated": 23
+  },
+  {
+   "name": "openingclosing_2023-04-17T122658+0100",
+   "folder": "openclose",
+   "class": "other",
+   "date": "2023-04-17",
+   "n_events_annotated": 18
+  },
+  {
+   "name": "regularshit_2023-04-17T130103+0100",
+   "folder": "regular",
+   "class": "background",
+   "date": "2023-04-17",
+   "n_events_annotated": 4
+  },
+  {
+   "name": "running_2023-04-17T122413+0100",
+   "folder": "running",
+   "class": "running",
+   "date": "2023-04-17",
+   "n_events_annotated": 10
+  },
+  {
+   "name": "walking2_2023-04-17T122153+0100",
+   "folder": "walk",
+   "class": "walking",
+   "date": "2023-04-17",
+   "n_events_annotated": 6
+  },
+  {
+   "name": "walking_2023-04-17T121933+0100",
+   "folder": "walk",
+   "class": "walking",
+   "date": "2023-04-17",
+   "n_events_annotated": 5
+  }
+ ],
+ "diagnostic_temporal_split": {
+  "classes": [
+   "background",
+   "digging",
+   "running",
+   "tampering"
+  ],
+  "rule": "first 60 % of the recording rows = train, 10 % gap dropped, last 30 % = test; label [DIAGNOSTIC - SAME RECORDING]; never in the headline metrics"
+ },
+ "deviations": [
+  "locked test = 4 of 16 recordings (25 %), above the 15-20 % target, because every evaluable class needs one test recording",
+  "the group is the recording file: the location along the cable is unknown and 12 of 16 recordings are from 2023-04-17, so cable zone x day or day grouping is not possible",
+  "walking has 2 recordings: 1 locked test, 1 development; its development folds have no walking training data in the fold that validates it",
+  "running, digging, background and tampering have 1 recording each: not evaluable on Brno",
+  "grouped 5-fold cross-validation on development is only descriptive (few recordings per class); no hyper-parameter is tuned on it"
+ ],
+ "created_by": "ai/make_splits.py",
+ "note": "written once before any training; never regenerated"
+}

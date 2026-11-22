@@ -2,10 +2,15 @@
   "use_real_ai": false,
   "classifier": {
     "mode": "uniform",
-    "comment": "TEMPORARY stub. mode 'uniform': correct with probability Pc, errors spread equally over the other classes (PLACEHOLDER shape). mode 'confusion': draw the output class from the row of the confusion matrix in confusion_file (e.g. results/classifier/confusion_grouped.json from the Brno test). Change only this file to switch; no code edit.",
+    "comment": "TEMPORARY stub. mode 'uniform': correct with probability Pc, errors spread equally over the other classes (PLACEHOLDER shape). mode 'confusion': row-normalised matrix of a json file (confusion_file). mode 'confusion_counts': event-level COUNTS in confusion_counts_file (csv: first column = true class, then one column per predicted class); every call of classify_batch (one simulated day) draws each row from Dirichlet(counts + prior), so the error rates carry the uncertainty of the few events behind them. Change only this file to switch; no code edit.",
     "Pc": 0.983,
     "Pc_source": "Pc_DAS of the parameter table, low end of 0.983 to 0.993 (wang2024); 0.993 is the high-end sensitivity",
-    "confusion_file": ""
+    "confusion_file": "",
+    "confusion_counts_file": "results/classifier/confusion_matrix.csv",
+    "dirichlet_prior": 0.5
   },
-  "reidentify": { "mode": "stub", "comment": "added in the profiling stage" }
+  "reidentify": {
+    "mode": "stub",
+    "comment": "added in the profiling stage"
+  }
 }

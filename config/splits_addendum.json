@@ -1,0 +1,7 @@
+{
+  "note": "config/splits.json is never regenerated (written once, seed 20261122, before any training). This addendum records an update of the PROTOCOL (Yomna, 23 Nov 2026) that does not change any group assignment.",
+  "diagnostic_temporal_split_supersedes": "the 60 % / 10 % gap / 30 % rule inside splits.json is replaced by: contiguous blocks, first 80 % of the recording rows = train, last 20 % = test, gap of 2 windows (one window + its overlap) between them; result labelled 'same recording, optimistic'",
+  "single_recording_classes": "stay in training, are out of the headline balanced accuracy and macro F1 (computed over the evaluable classes only, with their number and names printed); an evaluable-class event predicted as one of them counts as an error of the true class",
+  "running": "alarm class NOT evaluable on Brno (1 recording): priority for the FEBUS data collection",
+  "if_more_recordings": "if the second download batch brings more recordings of these classes, return to the split by recording and include them in the headline (needs a new locked-test choice only by a documented decision, never after seeing results)"
+}

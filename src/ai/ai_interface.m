@@ -3,7 +3,7 @@ function out = ai_interface(op, varargin)
 %
 %   cfg = ai_interface('config')                              settings from config/ai_config.json (use_real_ai, stub mode, Pc, confusion file)
 %   r   = ai_interface('classify_event', window)              r.class, r.confidence    window = struct with .dL (time x channel) and, for the STUB only, .truth
-%   r   = ai_interface('classify_batch', truth, s)            vectorised stub for the Monte Carlo: truth = cellstr / string of true classes, s = RandStream
+%   r   = ai_interface('classify_batch', truth, s)  (modes in config/ai_config.json: uniform | confusion | confusion_counts)            vectorised stub for the Monte Carlo: truth = cellstr / string of true classes, s = RandStream
 %   (stage 7: 'reidentify')
 %
 %   Classes (contract): walking, running, vehicle, digging, climbing, animal, no_event  (+ 'other' when the confusion file has it: a non-threat class).
@@ -35,7 +35,16 @@ function r = classify_batch(truth, s, cfg)
 truth = string(truth(:));   n = numel(truth);
 spec = ["walking" "running" "vehicle" "digging" "climbing" "animal" "no_event"];
 cls = truth;   conf = zeros(n, 1);
-if cfg.classifier.mode == "confusion"
+if cfg.classifier.mode == "confusion_counts"
+    T = readtable(fullfile(cfg.root, char(cfg.classifier.confusion_counts_file)), 'TextType', 'string');   names = string(T{:, 1});   Cn = T{:, 2:end};   pred = string(T.Properties.VariableNames(2:end));
+    M = zeros(size(Cn));   a = Cn + cfg.classifier.dirichlet_prior;   g = gaminv(rand(s, size(a)), a, 1);   M = g ./ sum(g, 2);      % one Dirichlet draw per row and per call (= per simulated day)
+    for k = 1:n
+        i = find(names == truth(k), 1);
+        if isempty(i) || sum(Cn(i, :)) == 0, cls(k) = uniform_one(truth(k), spec, cfg.classifier.Pc, s);   % class without data: PLACEHOLDER
+        else, cls(k) = pred(find(rand(s) <= cumsum(M(i, :)), 1));
+        end
+    end
+elseif cfg.classifier.mode == "confusion"
     J = jsondecode(fileread(fullfile(cfg.root, char(cfg.classifier.confusion_file))));   names = string(J.classes);   M = J.row_normalised;
     for k = 1:n
         i = find(names == truth(k), 1);

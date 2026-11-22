@@ -14,10 +14,10 @@ import pywt, librosa
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TABLE = os.path.join(ROOT, "config", "parameters_reviewed.tsv")
 
-CLASSES = ["walking", "running", "vehicle", "digging", "climbing", "no_event", "other"]      # 'animal' has no data (PLACEHOLDER in the stub)
-# folder of the Brno dataset -> our class (decisions 9 and 10 in report/decisions.md)
+CLASSES = ["walking", "running", "vehicle", "digging", "climbing", "tampering", "no_event", "other"]   # no_event = "background" of class_map.yaml; 'animal' has no data (PLACEHOLDER in the stub)
+# folder of the Brno dataset -> our class (config/class_map.yaml; manipulation is its own class 'tampering' since the protocol of 23 Nov, which changes decision 10)
 FOLDER_TO_CLASS = {"walk": "walking", "running": "running", "car": "vehicle", "construction": "digging", "fence": "climbing",
-                   "manipulation": "climbing", "regular": "no_event", "longboard": "other", "openclose": "other"}
+                   "manipulation": "tampering", "regular": "no_event", "longboard": "other", "openclose": "other"}      # = config/class_map.yaml (background = no_event)
 
 
 def table_value(sym):
