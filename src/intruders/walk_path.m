@@ -1,10 +1,11 @@
-function [path, v_mean, das_dur] = walk_path(r, G, P, s, piece, typ)
+function [path, v_mean, das_dur, along] = walk_path(r, G, P, s, piece, typ, doAlong)
 % WALK_PATH  Trajectory of one intruder from the boundary piece inward: random walk with drift, terrain-dependent speed.
 %
 %   [path, v_mean, das_dur] = walk_path(r, G, P, s, piece, typ)    typ 1 walking, 2 running, 3 vehicle, 4 digging, 5 climbing
 %   path = [t x y] at 1 s steps (t from 0 at the fibre). Digging / climbing first stay at the boundary (dur_dig_s / dur_climb_s,
 %   uniform 0.5x to 2x) and then walk. Speed = nominal x slope factor (1 - 0.5 min(slope/30 deg, 1), floor 0.4) x (1 + 10 % noise).
 %   das_dur = how long the event is visible to the fibre: the stay for digging / climbing, otherwise the time within 30 m of it.
+if nargin < 7, doAlong = false; end
 f = P.fd;   n0 = G.nrm(piece, :);   p0 = [r.x(piece) r.y(piece)];   h_in = atan2(n0(2), n0(1));
 switch typ
     case 1, v0 = f.v_walk + 0.2 * randn(s);
@@ -27,5 +28,12 @@ while t < tmax
     if (pos - p0) * n0' >= f.d_inward_end_m, break; end
 end
 path = buf(1:k, :);   v_mean = v0;
+along = struct('is', false, 'par_m', 0, 'lane_m', NaN);
+if doAlong && typ == 1                                           % first walk along the boundary (outside, parallel to the fibre), then turn in
+    par = f.d_along_m * (0.2 + 1.6 * rand(s));   lane = abs(f.d_lane_mean_m + randn(s));   tg = [-n0(2) n0(1)] * sign(randn(s));
+    m = max(1, round(par / v0));   par = m * v0;   tt = (-m:-1)';   % one point per second, walking along tg, passing the entry point at t = 0
+    pre = [tt, p0 - lane * n0 + tg .* (v0 * tt)];
+    path = [pre; path];   along = struct('is', true, 'par_m', par, 'lane_m', lane);
+end
 if stay > 0, das_dur = stay; else, das_dur = 60 / v0; end
 end

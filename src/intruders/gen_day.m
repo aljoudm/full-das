@@ -19,15 +19,18 @@ lamz = zr(:, 1) + diff(zr, 1, 2) .* rand(s, 3, 1);
 lamc = T.lambda.mid(:) ./ mean(zr(c.zoneCode(:), :), 2) .* lamz(c.zoneCode(:));
 nI = zeros(c.n, 1);   for i = 1:c.n, nI(i) = poisson(s, lamc(i)); end
 N = sum(nI);   cellOf = repelem((1:c.n)', nI);
+pAlong = P.fd.p_along;   if isfield(opts, 'p_along'), pAlong = opts.p_along; end
+isAl = false(N, 1);   parM = zeros(N, 1);   laneM = nan(N, 1);
 piece = zeros(N, 1);   typ = zeros(N, 1);   path = cell(N, 1);   spd = zeros(N, 1);   dur = zeros(N, 1);
 t0 = 86400 * rand(s, N, 1);
 for k = 1:N
     q = G.cellPieces{cellOf(k)};   piece(k) = q(find(rand(s) <= G.cellCdf{cellOf(k)}, 1));
     cl = TP.cls(piece(k));   typ(k) = find(rand(s) <= cumsum(G.ptype(cl, :)), 1);
-    [p, spd(k), dur(k)] = walk_path(r, G, P, s, piece(k), typ(k));
-    p(:, 1) = p(:, 1) + t0(k);   path{k} = p;
+    [p, spd(k), dur(k), al] = walk_path(r, G, P, s, piece(k), typ(k), rand(s) < pAlong);
+    p(:, 1) = p(:, 1) + t0(k);   path{k} = p;   isAl(k) = al.is;   parM(k) = al.par_m;   laneM(k) = al.lane_m;
 end
 ev = mk(N, day, t0, "intrusion", string(G.types(typ))', true(N, 1), cellOf, piece, TP.cls(piece), r, spd, dur, false(N, 1), path);
+ev.along = isAl;   ev.par_m = parM;   ev.lane_m = laneM;
 if io, return; end
 % --- non-intrusion events (no trajectory stored)
 nA = poisson(s, f.lam_animal_km_day * G.km);   pa = ceil(G.n * rand(s, nA, 1));
@@ -36,6 +39,9 @@ nV = poisson(s, f.n_vehicle_site_day * numel(G.sites.x));   pv = G.sitePiece(cei
 E2 = mk(nV, day, 86400 * rand(s, nV, 1), "normal_vehicle", repmat("vehicle", nV, 1), false(nV, 1), r.cell(pv), pv, zeros(nV, 1), r, f.v_vehicle_road * ones(nV, 1), 60 / f.v_vehicle_road * ones(nV, 1), true(nV, 1), cell(nV, 1));
 nN = poisson(s, f.lam_noise_km_day * G.km);   pn = ceil(G.n * rand(s, nN, 1));
 E3 = mk(nN, day, 86400 * rand(s, nN, 1), "noise", repmat("no_event", nN, 1), false(nN, 1), r.cell(pn), pn, zeros(nN, 1), r, zeros(nN, 1), 10 * ones(nN, 1), false(nN, 1), cell(nN, 1));
+E1.along = false(height(E1), 1);   E1.par_m = zeros(height(E1), 1);   E1.lane_m = nan(height(E1), 1);
+E2.along = false(height(E2), 1);   E2.par_m = zeros(height(E2), 1);   E2.lane_m = nan(height(E2), 1);
+E3.along = false(height(E3), 1);   E3.par_m = zeros(height(E3), 1);   E3.lane_m = nan(height(E3), 1);
 ev = [ev; E1; E2; E3];   ev.id = (1:height(ev))';
 end
 

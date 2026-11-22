@@ -42,3 +42,12 @@ All three cases reproduce `optimization/report/key_results.md` (frozen f51b223) 
 | Window vs full 20 km engine (walking 12 km, vehicle 4 km, digging 18 km) | full S = 146 / 674 / 251 inside or within a factor 1.3 of the window range (102-176 / 299-780 / 105-192); background 3.4 vs 2.1-4.5 | `validate_full_engine` |
 | Engine backscatter slope | -0.403 dB/km (OTDR- model and theory -0.400); resolution 10.00 m (OTDR-: 10.2 m) | `validate_full_engine` |
 | One simulated day through the DAS (medium allocation) | 37 / 37 intrusions detected; animals 293 / 450, authorized vehicles 2553 / 2647, noise 894 / 2854 detected (these go to the classifier) | `test_stage4` |
+
+## Stage 7: who can have their height estimated (`scripts/stage7_height_share.m`, 300 days per case, medium allocation; `results/stage7_height_share.csv`)
+The height method (Engyom/DAS- v2.2-sim) needs a walker, parallel to the fibre within 3 m, with at least 8 validated footsteps, detected with SNR >= 12 dB. The along-boundary behaviour (`p_along`, ASSUMED) is the only way to meet it; a crossing person never qualifies (camera instead). The height model itself is NOT called here; the SNR is the engine's local SNR (here always above 26 dB, so the 12 dB condition never binds in simulation: the real value is measured in Phase 0).
+| p_along | walking | along-boundary path | height measurable, all intruders | of along-boundary paths | of crossing walkers | of all walkers |
+| --- | --- | --- | --- | --- | --- | --- |
+| 0 % | 49.7 % | 0.0 % | 0.0 % | n/a | 0.0 % | 0.0 % |
+| 10 % | 49.7 % | 4.7 % | 4.1 % | 88.1 % | 0.0 % | 8.3 % |
+| 30 % | 49.4 % | 15.2 % | 13.4 % | 87.9 % | 0.0 % | 27.0 % |
+Reasons a walker is not measurable (p_along 10 %): crossing 84.5 %, not detected 6.5 %, lane farther than 3 m 0.7 %. Height is a secondary, exploratory indicator (+/- 8 cm); the primary claim is stride, speed and cadence.

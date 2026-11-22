@@ -1,0 +1,12 @@
+
+	Trial License -- for use to evaluate programs for possible purchase as an end-user only.
+
+get_allocation: loaded C:\Users\aljou\OneDrive\Desktop\full das\results\alloc_medium_22.mat
+build_das_library: loaded C:\Users\aljou\OneDrive\Desktop\full das\results\das_library.mat
+p_along 0.00: 7716 intruders (300 days) | walking 49.7% | along-boundary path 0.0% | height measurable: 0.0% of all, NaN% of along-boundary paths, 0.0% of walking crossings, 0.0% of all walkers
+   walkers by reason: crossing 93.1%, not_detected 6.9%
+p_along 0.10: 7892 intruders (300 days) | walking 49.7% | along-boundary path 4.7% | height measurable: 4.1% of all, 88.1% of along-boundary paths, 0.0% of walking crossings, 8.3% of all walkers
+   walkers by reason: crossing 84.5%, not_detected 6.5%, ok 8.3%, too_far 0.7%
+p_along 0.30: 7735 intruders (300 days) | walking 49.4% | along-boundary path 15.2% | height measurable: 13.4% of all, 87.9% of along-boundary paths, 0.0% of walking crossings, 27.0% of all walkers
+   walkers by reason: crossing 64.2%, not_detected 7.0%, ok 27.0%, too_far 1.8%
+done

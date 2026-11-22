@@ -44,8 +44,8 @@ end
 % ---- 4) trajectories: start on the boundary, end inside, mean speed by type
 nIn = 0;   nTr = 0;   tcap = 0;
 for k = 1:min(height(ev), 3000)
-    p = ev.path{k};   assert(abs(p(1, 2) - ev.x(k)) < 1e-6 && abs(p(1, 3) - ev.y(k)) < 1e-6, 'path does not start at the entry point');
-    nTr = nTr + 1;   nIn = nIn + inpolygon(p(end, 2), p(end, 3), poly(:, 1), poly(:, 2));   tcap = tcap + (p(end, 1) - p(1, 1) >= f.t_traj_max_s);
+    p = ev.path{k};   i0 = find(p(:, 1) >= ev.t_start(k) - 1e-9, 1);   assert(abs(p(i0, 2) - ev.x(k)) < 1e-6 && abs(p(i0, 3) - ev.y(k)) < 1e-6, 'path does not pass the entry point at t_start');
+    nTr = nTr + 1;   nIn = nIn + inpolygon(p(end, 2), p(end, 3), poly(:, 1), poly(:, 2));   tcap = tcap + (p(end, 1) - ev.t_start(k) >= f.t_traj_max_s);
 end
 fprintf('trajectories ending inside the boundary: %d of %d (hit the time cap: %d)\n', nIn, nTr, tcap);
 assert(nIn / nTr > 0.90, 'too many trajectories end outside');   % the rest leave the polygon at concave bends of the boundary (local normal, random walk)

@@ -16,12 +16,18 @@ def fetch_part(args):
     member_tag, off, n, path = args
     if os.path.isfile(path) and os.path.getsize(path) == n:
         return n
-    rf = RangeFile()
+    import time
     data = b""
-    while len(data) < n:                       # a response may be shorter than asked: keep going
-        rf.seek(off + len(data))
-        chunk = rf._fetch(off + len(data), min(n - len(data), 16 * 1024 * 1024))
-        data += chunk
+    for attempt in range(12):                  # signed URLs expire / the server throttles: new URL and back-off, never give up quickly
+        try:
+            rf = RangeFile()
+            while len(data) < n:               # a response may be shorter than asked: keep going
+                data += rf._fetch(off + len(data), min(n - len(data), 16 * 1024 * 1024))
+            break
+        except Exception as e:
+            time.sleep(5 * (attempt + 1))
+    assert len(data) == n, "part incomplete"
+
     tmp = path + ".tmp"
     with open(tmp, "wb") as f:
         f.write(data)
