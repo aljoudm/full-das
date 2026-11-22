@@ -27,7 +27,7 @@ A("* **What Brno can prove:** the largest class has 17 events with a 1 s window 
 cl = t["recall"].get("climbing")
 if cl: A(f"* **Climbing scored {round(cl['value'] * cl['n_events'])} of {cl['n_events']}**: expected, because the training has only 2 climbing events from 2 recordings (momentary fence impacts); the result cannot tell a weak classifier from an unusual fence recording.")
 bg = m1.get("diagnostic_background_false_alarms") or {}
-if bg: A(f"* **Background (diagnostic, [DIAGNOSTIC - SAME RECORDING], same recording, optimistic):** {bg['alarm_class_events']} alarm-class events among {bg['background_events']} background events over {bg['km_days']:.1e} km-days; the {bg'duration_s':.0f} s of the last 20 % prove nothing about false alarms. The operational rate needs at least 30 km-days of clean FEBUS background without a false alarm to show an upper bound of 0.1 per km per day.")
+if bg: A(f"* **Background (diagnostic, [DIAGNOSTIC - SAME RECORDING], same recording, optimistic):** {bg['alarm_class_events']} alarm-class events among {bg['background_events']} background events over {bg['km_days']:.1e} km-days; the {bg['duration_s']:.0f} s of the last 20 % prove nothing about false alarms. The operational rate needs at least 30 km-days of clean FEBUS background without a false alarm to show an upper bound of 0.1 per km per day.")
 for c, v in (m1.get("diagnostic_single_recording_classes") or {}).items(): A(f"* [DIAGNOSTIC - SAME RECORDING, optimistic] {c}: {v['events']} events in the last 20 % of its only recording, recall {v['recall']:.2f}.")
 if m2:
     t2 = m2["locked_test"]
