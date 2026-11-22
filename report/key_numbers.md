@@ -29,3 +29,16 @@ All three cases reproduce `optimization/report/key_results.md` (frozen f51b223) 
 | Mean speed walking / running / vehicle | 1.40 / 3.49 / 8.02 m/s | table `v_walk`, `v_run`, `v_vehicle_off` |
 | Non-intrusion events per day (animals / authorized vehicles / noise) | 436 / 2,688 / 2,912 (PLACEHOLDER rates) | table `lam_animal_km_day`, `n_vehicle_site_day`, `lam_noise_km_day` |
 | Trajectories ending inside the boundary | 92.9 % (the rest leave the polygon at concave bends of the boundary) | `test_stage3` |
+
+## Stage 4: DAS window library (`tests/test_stage4.m`, `tests/validate_full_engine.m`; frozen engine of DAS-Simulation 3a8862b)
+| Quantity | Value | Source |
+| --- | --- | --- |
+| Window | 300 m x 2.0 s, 140 channels (2 m), 510 Hz (PLACEHOLDER: must match the AI input) | table `L_win_m`, `T_win_s`, `fs_win_hz` |
+| Local SNR 0.5 / 10 / 20 km from the interrogator | 34.55 / 30.75 / 26.75 dB (analytic 34.54 / 30.74 / 26.74) | `tests/test_stage4.m` vs `das_params` |
+| Detection threshold (statistic S) | 21.8 (mean + 6 sigma of log S of 300 noise-only windows); noise-only windows above it: 0 of 300; normal-tail estimate 1e-9 per window | `lib.thr` |
+| **Monte Carlo detection rate of the simulated DAS, intrusion types** | **0.977** (420-window library; depends on the ASSUMED amplitudes and coupling spread, so it is a result of the model, reported separately from the literature Pd_DAS = 0.969) | `test_stage4` |
+| Detection by distance (walking) | 1.00 / 1.00 / 1.00 / 0.75 / 0.92 at 0.5 / 5 / 10 / 15 / 20 km | `test_stage4` |
+| Localization error of detected intrusions | median 4 m, 95th percentile 8 m, max 16 m (engine resolution 10 m, channel spacing 2 m) | `test_stage4` |
+| Window vs full 20 km engine (walking 12 km, vehicle 4 km, digging 18 km) | full S = 146 / 674 / 251 inside or within a factor 1.3 of the window range (102-176 / 299-780 / 105-192); background 3.4 vs 2.1-4.5 | `validate_full_engine` |
+| Engine backscatter slope | -0.403 dB/km (OTDR- model and theory -0.400); resolution 10.00 m (OTDR-: 10.2 m) | `validate_full_engine` |
+| One simulated day through the DAS (medium allocation) | 37 / 37 intrusions detected; animals 293 / 450, authorized vehicles 2553 / 2647, noise 894 / 2854 detected (these go to the classifier) | `test_stage4` |
