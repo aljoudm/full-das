@@ -1,0 +1,86 @@
+{
+ "development": {
+  "walking": {
+   "windows": 694,
+   "events": 6,
+   "recordings": 1
+  },
+  "running": {
+   "windows": 839,
+   "events": 8,
+   "recordings": 1
+  },
+  "vehicle": {
+   "windows": 1503,
+   "events": 15,
+   "recordings": 3
+  },
+  "digging": {
+   "windows": 240,
+   "events": 2,
+   "recordings": 1
+  },
+  "climbing": {
+   "windows": 240,
+   "events": 2,
+   "recordings": 2
+  },
+  "tampering": {
+   "windows": 1112,
+   "events": 14,
+   "recordings": 1
+  },
+  "no_event": {
+   "windows": 480,
+   "events": 4,
+   "recordings": 1
+  },
+  "other": {
+   "windows": 1688,
+   "events": 18,
+   "recordings": 2
+  }
+ },
+ "locked_test": {
+  "walking": {
+   "windows": 296,
+   "events": 4,
+   "recordings": 1
+  },
+  "running": {
+   "windows": 0,
+   "events": 0,
+   "recordings": 0
+  },
+  "vehicle": {
+   "windows": 240,
+   "events": 2,
+   "recordings": 1
+  },
+  "digging": {
+   "windows": 0,
+   "events": 0,
+   "recordings": 0
+  },
+  "climbing": {
+   "windows": 98,
+   "events": 7,
+   "recordings": 1
+  },
+  "tampering": {
+   "windows": 0,
+   "events": 0,
+   "recordings": 0
+  },
+  "no_event": {
+   "windows": 0,
+   "events": 0,
+   "recordings": 0
+  },
+  "other": {
+   "windows": 360,
+   "events": 3,
+   "recordings": 1
+  }
+ }
+}

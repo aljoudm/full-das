@@ -65,3 +65,16 @@ The 0.97 was the target on the development mix (pooled 0.978). On the full grid 
 ## Main sentence (base drone camera, 2.5 m)
 With the base drone camera (2.5 m position error, ASSUMED / proxy), people 10 m apart and nobody walking in a pair, **99.6 % [99.5, 99.7] of the person-level links that are made are correct, 79.7 % of the tracks get such a link and 0.3 wrong links are made per 100 tracks**; with half of the people walking in pairs, the links made are 96.6 % [96.2, 97.0] correct, only 51.5 % of the tracks get a person-level link (57.6 % get any link, person or group) and 1.7 wrong links per 100 tracks are made. At 2 m spacing the figures are 97.5 % and 43.4 % (no pairs) and 94.5 % and 30.4 % (50 % pairs): the 0.97 target is not kept there. All SIMULATED.
 
+
+## Where the 0.97 is lost: the limits (cells below 0.97 and the group-level accuracy of the SAME cells)
+
+Cells in which the accuracy of the person-level links made is below 0.97 (point value). For the same cells the table gives the group-level accuracy (share of all tracks linked to the right group, person or group link) and the accuracy of ALL decisions made (person or group), so the limit of the person-level claim is visible together with what the group level still gives.
+
+| Camera | Cells below 0.97 | of them with pairs | with spacing 2 m or 1 m | with camera dropout 20 % | Person-level accuracy (all tracks), median [min] | Group-level accuracy, median [min] | Accuracy of all decisions (person or group), median [min] |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| fixed camera, 1 m | 228 | 198 (87 %) | 126 (55 %) | 151 (66 %) | 0.48 [0.15] | 0.51 [0.17] | 0.92 [0.60] |
+| drone, 1.5 m | 86 | 74 (86 %) | 50 (58 %) | 57 (66 %) | 0.49 [0.24] | 0.54 [0.31] | 0.92 [0.65] |
+| drone, 2.5 m (base) | 98 | 86 (88 %) | 57 (58 %) | 60 (61 %) | 0.42 [0.18] | 0.47 [0.23] | 0.92 [0.60] |
+| drone, 5 m | 121 | 97 (80 %) | 69 (57 %) | 72 (60 %) | 0.34 [0.13] | 0.36 [0.15] | 0.92 [0.60] |
+
+The limits, as stated conditions: **people walking in pairs, spacing of 2 m or less, and camera dropout.** In these cells the person-level claim (97 % of the links made correct) does not hold; the operator should rely on `ambiguous` and on the group link. The group-level accuracy is higher than the person-level one in the pair cells because the two people of a pair are one group, but in crowded cells with dropout it also falls: the numbers above are the honest range. Per-cell values with 95 % limits: `results/reid/reid_grid.csv`.

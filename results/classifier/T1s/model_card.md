@@ -1,0 +1,10 @@
+# Model card: temporary event classifier (ViT-1D on MFCC + RDFT + DWT), window 1 s
+**Brno results; FEBUS not yet tested.** Brno accuracy is not system accuracy and not FEBUS accuracy.
+* Data: Brno DAS dataset (Tomasov et al. 2025, CC BY), raw int16, 20 kHz, OptaSense, resampled to 510 Hz, one channel per window. Classes: walking, running, vehicle, digging, climbing, tampering, no_event, other ('animal' absent).
+* Split: config/splits.json (seed 20261122, written once); group = recording file; locked test = fence_2023-04-17T123117+0100, longboard_2023-04-17T123543+0100, auto4_2023-06-06T144655+0100, walking_2023-04-17T121933+0100.
+* Evaluation: event level, balanced accuracy 0.750 over 4 evaluable classes, 16 test events from 4 recordings; intervals in metrics.json. Classes with one recording are not evaluable on Brno.
+* Preprocessing and class weights are fitted on the development recordings only; no hyper-parameter was tuned (fixed: 3 layers, d = 64, 30 epochs).
+* **Running is an alarm class that is NOT evaluated on Brno** (1 recording; same for digging = construction, tampering, background): it stays in training and has priority when FEBUS data are collected. Balanced accuracy and macro F1 are over the 4 evaluable classes only (walking, vehicle, climbing, other); an event of an evaluable class predicted as a single-recording class counts as an error of its true class.
+* **Only 4 test recordings.** Per-recording results and Clopper-Pearson intervals on events are in metrics.json; the cluster bootstrap is not meaningful with so few recordings. Even if every event of the largest class were correct, the one-sided 95 % lower bound on recall would be at most 0.652 (0.05^(1/n), n = events of that class): Brno shows that the classifier works, the real accuracy has to come from FEBUS.
+* Known limits: very few events per class; one site and one interrogator; windows of an event are correlated; confidence is not calibrated beyond the reliability plot; no unknown option.
+* Commit 80dce1f13319a7e5b0264c2ebca5d38121148efc; model checksum 7bae961b94e52743ac617949dd4bd21e2a2b4aaa5e3a34ae24dde6dd22bf3f4c.

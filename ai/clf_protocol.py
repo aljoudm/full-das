@@ -155,7 +155,7 @@ def main():
     print(f"\n[DIAGNOSTIC] random 80/10/10 WINDOW split (run once): window accuracy {acc_rand_win:.3f}  vs grouped locked test, window accuracy {acc_grp_win:.3f}  -> gap {100 * (acc_rand_win - acc_grp_win):.1f} points (windows overlap: not independent)")
     # ---- 4b) single-recording classes, DIAGNOSTIC (Yomna's update 23 Nov): contiguous blocks, first 80 % of the recording rows = train, last 20 % = test,
     #          with a gap of 2 windows (one window + its overlap) between them; the result is "same recording, optimistic"
-    single = [c for c in SPLIT["not_evaluable_on_brno"]]; diag = {}
+    single = [("no_event" if c == "background" else c) for c in SPLIT["not_evaluable_on_brno"]]; diag = {}      # class_map.yaml says background, the code says no_event
     if single:
         Xs, ys, rs, es, hs, rows = assemble(D, dev); trm = np.ones(len(ys), bool); tem = np.zeros(len(ys), bool)
         for n in set(rs):
@@ -206,6 +206,8 @@ def main():
 * Preprocessing and class weights are fitted on the development recordings only; no hyper-parameter was tuned (fixed: 3 layers, d = 64, {EPOCHS} epochs).
 * **Running is an alarm class that is NOT evaluated on Brno** (1 recording; same for digging = construction, tampering, background): it stays in training and has priority when FEBUS data are collected. Balanced accuracy and macro F1 are over the {len(present)} evaluable classes only ({', '.join(cc.CLASSES[c] for c in present)}); an event of an evaluable class predicted as a single-recording class counts as an error of its true class.
 * **Only {ntest_rec} test recordings.** Per-recording results and Clopper-Pearson intervals on events are in metrics.json; the cluster bootstrap is not meaningful with so few recordings. Even if every event of the largest class were correct, the one-sided 95 % lower bound on recall would be at most {max(ceil_.values()):.3f} (0.05^(1/n), n = events of that class): Brno shows that the classifier works, the real accuracy has to come from FEBUS.
+* **Climbing (fence) scored 0 of the test events when it did so, which was expected:** the classifier is trained on only 2 climbing events from 2 recordings (momentary fence impacts), and the test result cannot tell a weak classifier from an unusual fence recording (a single recording of 12 annotated impacts). It is a statement about these data, not about the classifier.
+* **Use in the simulation:** the Brno matrix is a SENSITIVITY only ("Brno, 4 test recordings, SENSITIVITY"); the uniform stub (Pc from the literature) stays the base. Classes missing from the matrix fall back to the uniform stub.
 * Known limits: very few events per class; one site and one interrogator; windows of an event are correlated; confidence is not calibrated beyond the reliability plot; no unknown option.
 * Commit {commit}; model checksum {ck}.
 """)
