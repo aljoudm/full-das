@@ -49,17 +49,13 @@ g = lambda s, v, sp: float([x for x in ab if x["camera_source"] == s and x["vari
 A("* **Ablation (base drone camera, no pairs, person-level accuracy over all tracks):** " + "; ".join(f"{sp} m: height adds {100 * (g('drone_base', 'all cues', sp) - g('drone_base', 'no height', sp)):.1f} points, cadence adds {100 * (g('drone_base', 'all cues', sp) - g('drone_base', 'no cadence', sp)):.1f} points" for sp in (20, 10, 5, 2)) + ". Cadence helps only if the camera can measure it to +/- 3 steps/min (ASSUMED, untested).")
 import statistics as st
 names = {"fixed": "fixed camera, 1 m", "drone_optimistic": "drone, 1.5 m", "drone_base": "drone, 2.5 m (base)", "drone_pessimistic": "drone, 5 m"}
-A("
-**Where the 0.97 is lost (the limits).** Cells where the accuracy of the person-level links made is below 0.97, with the group-level accuracy of the SAME cells (point values; accuracy over all tracks counts an ambiguous track as not linked; the last column is the accuracy of all decisions made):
-")
-A("| Camera | Cells below 0.97 | with pairs | with spacing 2 m or 1 m | with dropout 20 % | Person-level accuracy, median [min] | Group-level accuracy, median [min] | Accuracy of all decisions (person or group), median [min] |
-| --- | --- | --- | --- | --- | --- | --- | --- |")
+A("\n**Where the 0.97 is lost (the limits).** Cells where the accuracy of the person-level links made is below 0.97, with the group-level accuracy of the SAME cells (point values; accuracy over all tracks counts an ambiguous track as not linked; the last column is the accuracy of all decisions made):\n")
+A("| Camera | Cells below 0.97 | with pairs | with spacing 2 m or 1 m | with dropout 20 % | Person-level accuracy, median [min] | Group-level accuracy, median [min] | Accuracy of all decisions (person or group), median [min] |\n| --- | --- | --- | --- | --- | --- | --- | --- |")
 for src in ("fixed", "drone_optimistic", "drone_base", "drone_pessimistic"):
     rr = [r for r in rows if r["camera_source"] == src and f(r, "person_link_acc") < 0.97]; n = len(rr)
     pa = [f(r, "person_acc") for r in rr]; ga = [f(r, "group_acc") for r in rr]; da = [f(r, "decided_acc") for r in rr]
     A(f"| {names[src]} | {n} | {sum(f(r, 'pairs_share') > 0 for r in rr)} | {sum(f(r, 'spacing_m') <= 2 for r in rr)} | {sum(f(r, 'camera_dropout') > 0 for r in rr)} | {st.median(pa):.2f} [{min(pa):.2f}] | {st.median(ga):.2f} [{min(ga):.2f}] | {st.median(da):.2f} [{min(da):.2f}] |")
-A("
-Limits as conditions: **people walking in pairs, spacing of 2 m or less, camera dropout.** There the person-level claim does not hold and the operator relies on `ambiguous` and the group link.")
+A("\nLimits as conditions: **people walking in pairs, spacing of 2 m or less, camera dropout.** There the person-level claim does not hold and the operator relies on `ambiguous` and the group link.")
 A("* Fixed cameras cover only 1.9 % of the boundary, so most links will be with the drone. An `ambiguous` link never sends a patrol to a specific person; a DAS-only track is an alarm and goes to the drone.\n")
 
 # ---------------- 3. dual verification
