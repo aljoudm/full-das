@@ -10,7 +10,7 @@
 
 ## Data outside git history
 * `data/dem/dem_aoi.mat` (6.8 MB): Copernicus DEM GLO-30 (AWS Open Data `copernicus-dem-30m`, tiles N21 E039 and N21 E040), cropped by DAS-map `prepare_terrain.m` to the boundary bounding box +/- 0.05 deg. Copied from the local DAS-map run (2026-11-01). Attribution wording: see DAS-map `data/SOURCES.md` (adapted GLO-30 data). It is a DSM (includes buildings).
-* OSM data (roads, later tracks / landuse): osm_contributors, ODbL. Each fetch is stored with its date.
+* OSM data: `third_party/dasmap_data/roads_osm.*` (fetched by DAS-map) and `data/osm/` (tracks, unclassified roads, urban landuse / place, fetched 2026-11-22, see `data/osm/README.md`): osm_contributors, ODbL. Each fetch is stored with its date.
 
 ## Table
 `config/parameters_reviewed.tsv` started as a copy of `optimization/parameters_reviewed.tsv` at f51b223 and is now THE single parameter table of full-das (10th column `value_type`, rows added 22 Nov 2026 are tagged `[full-das 2026-11-22]`).
