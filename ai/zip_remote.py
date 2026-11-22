@@ -14,13 +14,17 @@ class RangeFile(io.RawIOBase):
     """Minimal seekable file over HTTP Range requests, with a small read-ahead cache."""
 
     def __init__(self, url=URL):
-        self.url = url
-        req = urllib.request.Request(url, headers={**UA, "Range": "bytes=0-0"})
-        with urllib.request.urlopen(req) as r:
-            self.size = int(r.headers["Content-Range"].split("/")[1])
-            self.url = r.geturl()          # resolved (signed) URL
+        self.base = url
+        self._resolve()
         self.pos = 0
         self._cache = (0, b"")
+
+    def _resolve(self):
+        # figshare redirects to a signed, short-lived URL: resolve again whenever it expires (HTTP 403)
+        req = urllib.request.Request(self.base, headers={**UA, "Range": "bytes=0-0"})
+        with urllib.request.urlopen(req) as r:
+            self.size = int(r.headers["Content-Range"].split("/")[1])
+            self.url = r.geturl()
 
     def readable(self): return True
     def seekable(self): return True
@@ -32,9 +36,14 @@ class RangeFile(io.RawIOBase):
 
     def _fetch(self, start, n):
         end = min(start + n, self.size) - 1
-        req = urllib.request.Request(self.url, headers={**UA, "Range": f"bytes={start}-{end}"})
-        with urllib.request.urlopen(req, timeout=120) as r:
-            return r.read()
+        for attempt in range(3):
+            try:
+                req = urllib.request.Request(self.url, headers={**UA, "Range": f"bytes={start}-{end}"})
+                with urllib.request.urlopen(req, timeout=120) as r:
+                    return r.read()
+            except urllib.error.HTTPError as e:
+                if e.code not in (400, 403) or attempt == 2: raise
+                self._resolve()
 
     def read(self, n=-1):
         if n < 0: n = self.size - self.pos
