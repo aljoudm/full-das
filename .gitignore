@@ -7,3 +7,9 @@ __pycache__/
 *.pyc
 .venv/
 results/das_library.mat
+
+# Brno DAS dataset lives OUTSIDE the repo (C:\data\das_brno); never commit it
+C:/data/
+das_brno/
+*.h5
+*.zip

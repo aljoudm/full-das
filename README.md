@@ -38,3 +38,11 @@ ai/                    Python side of the AI (ai_real.py, same signatures as the
 tests/  results/  report/
 ```
 Source repos (read only): aljoudm/DAS-map-, aljoudm/optimization, aljoudm/DAS-Simulation, aljoudm/OTDR-, Engyom/DAS-.
+
+## Brno DAS dataset (classifier training; NOT in git)
+* Source: Tomasov et al., figshare DOI 10.6084/m9.figshare.27004732, CC BY (paper: https://doi.org/10.1038/s41597-025-05088-4). File `DAS-dataset.zip`, **47,120,418,495 bytes**, **MD5 77e990a08907c2a4b16997e95f31b55e**, direct link `https://ndownloader.figshare.com/files/52736258`.
+* Keep it OUTSIDE the project (the project is inside OneDrive): `C:\data\das_brno`. The Python environment is in `C:\data\venv_das`.
+* The zip holds 9 label folders; each has long raw recordings (`*.h5`, 1 to 5.7 GB) plus a small bitmap (`*.npy`) and `*.json` saying which windows carry the label (about 18 MB for all bitmaps).
+  `ai/zip_remote.py` reads the zip over HTTP range requests, so the small files and only the needed parts of selected recordings can be fetched without downloading 47 GB
+  (`python -I ai/zip_remote.py list`, `... get <member> <out_dir>`). A full download is possible with `curl -L -C - -o DAS-dataset.zip <link>` (about 0.5 MB/s per stream here, many hours); verify with the MD5 above.
+* The dataset's own `python/` loader is GPL-3.0; full-das does not copy it (own implementation in `ai/`).
