@@ -5,7 +5,7 @@ fprintf('--- Stage 0 tests ---\n');
 % 1) table: 10 columns, value_type on every row, new rows present
 P = load_params_fd();
 assert(P.v.AD0 == 0.98 || P.v.AD0 == 98, 'AD0 not read');
-syms = {'dx_prof','GL_prof','fs_prof','SNR_min_prof','n_steps_min','d_lane_max','height_unc','FAR_per_km_day'};
+syms = {'dh_reid_max','Pc_DAS_public','dx_prof','GL_prof','fs_prof','SNR_min_prof','n_steps_min','d_lane_max','height_unc','FAR_per_km_day'};
 for k = 1:numel(syms), assert(isKey(P.value_type, syms{k}), 'row missing: %s', syms{k}); end
 assert(all(~strcmp(values(P.value_type), '?')), 'unclassified value_type');
 assert(P.fd.dx_prof == 0.4 && P.fd.GL_prof == 0.8 && P.fd.fs_prof == 500 && P.fd.SNR_min_prof == 12 && ...
