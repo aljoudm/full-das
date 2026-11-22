@@ -34,6 +34,7 @@ R = load(fullfile(root, 'third_party', 'dasmap_data', 'roads_osm.mat'));   T.roa
 r = c.ring;   T.ring_ll = [r.lat0 + r.y(:) / r.ky, r.lon0 + r.x(:) / r.kx];
 % --- terrain
 D = load(fullfile(root, 'data', 'dem', 'dem_aoi.mat'));
+if D.lat(1) > D.lat(end), D.lat = flipud(D.lat(:));   D.Z = flipud(D.Z); end      % latitude ascending with the row index (north up in plots)
 kyd = 111195;   kxd = 111195 * cosd(mean(D.lat));
 [gx, gy] = gradient(double(D.Z), mean(diff(D.lon(:))) * kxd, mean(diff(D.lat(:))) * kyd);   % lat ascends with row index
 T.dem = struct('Z', D.Z, 'lat', D.lat(:), 'lon', D.lon(:), 'slope_deg', atand(hypot(gx, gy)));

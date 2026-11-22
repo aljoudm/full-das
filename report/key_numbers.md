@@ -18,3 +18,14 @@ All three cases reproduce `optimization/report/key_results.md` (frozen f51b223) 
 | Interrogators / fibre | 4 / 145.46 km | `alloc` |
 | Power of new equipment | 1360 W = 4 x (170 + 170), 4.67 % of P0 = 29,100 W | `alloc.power` (the table row P_DAS_total = 680 W excludes the cabins) |
 | Cells below AD0 | 139 of 139 (Pd_DAS = 0.969 < 0.98, gap 0.011) | `alloc.n_violations`; expected (report section 2): a literature value until our Monte Carlo gives Pd_DAS |
+
+## Stage 3: event generator (`tests/test_stage3.m`, 400 simulated days, seed 20261122; all rates ASSUMED or PLACEHOLDER)
+| Quantity | Value | Source |
+| --- | --- | --- |
+| Intrusions per day Hot / Neutral / Cold | 15.7 / 9.0 / 1.5 (expected 15.5 / 9.0 / 1.5) | `gen_day`, table `lambda_*` |
+| Share of boundary length by entry class (wadi / track / urban / slope / flat) | 0.088 / 0.051 / 0.258 / 0.053 / 0.550 | `terrain_pieces` (DEM, OSM 2026-11-22) |
+| Share of entries by class | 0.116 / 0.051 / 0.185 / 0.088 / 0.560 (matches the weights: 0.115 / 0.053 / 0.186 / 0.089 / 0.557) | `test_stage3` |
+| Type proportions | match the table rows `p_type_*` within 4 standard errors | `test_stage3` |
+| Mean speed walking / running / vehicle | 1.40 / 3.49 / 8.02 m/s | table `v_walk`, `v_run`, `v_vehicle_off` |
+| Non-intrusion events per day (animals / authorized vehicles / noise) | 436 / 2,688 / 2,912 (PLACEHOLDER rates) | table `lam_animal_km_day`, `n_vehicle_site_day`, `lam_noise_km_day` |
+| Trajectories ending inside the boundary | 92.9 % (the rest leave the polygon at concave bends of the boundary) | `test_stage3` |

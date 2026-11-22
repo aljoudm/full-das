@@ -25,9 +25,10 @@ cleanup = onCleanup(@() delete(tmp));
 P = load_params(tmp);
 P.tsvFile = string(tsvFile);   P.value_type = vt;
 % rows added by full-das that the frozen loader does not know: read them here (numeric value of the table row)
-P.fd = struct();
+P.fd = struct();   P.fdstr = struct();
 for r = 2:numel(lines)
     c = split(lines(r), char(9));   sym = matlab.lang.makeValidName(char(strtrim(c(1))));
     x = str2double(strtrim(c(4)));   if ~isnan(x), P.fd.(sym) = x; end
+    P.fdstr.(sym) = char(strtrim(c(4)));          % raw text of the value (ranges, slash-separated proportions)
 end
 end
