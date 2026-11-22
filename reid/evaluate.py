@@ -45,7 +45,7 @@ def pooled(M):
     s = M.sum(0); g = dict(zip(COLS, s)); idtp = g["linked_correct"] - 0; idfp = g["wrong_person_links"]; idfn = g["n_cp"] - g["person_correct"]
     div = lambda a, b: float(a / b) if b > 0 else float("nan")
     return {"person_acc": div(g["person_correct"], g["n_cp"]), "group_acc": div(g["group_correct"], g["n_cp"]), "decision_rate": div(g["decided"], g["n_das"]),
-            "decided_acc": div(g["decided_correct"], g["decided"]), "wrong_links_per_100": 100 * div(g["wrong_person_links"], g["n_das"]), "idf1": div(2 * idtp, 2 * idtp + idfp + idfn)}
+            "decided_acc": div(g["decided_correct"], g["decided"]), "person_link_rate": div(g["linked"], g["n_das"]), "person_link_acc": div(g["linked_correct"], g["linked"]), "wrong_links_per_100": 100 * div(g["wrong_person_links"], g["n_das"]), "idf1": div(2 * idtp, 2 * idtp + idfp + idfn)}
 
 
 def bootstrap(M, B=2000, seed=0):
@@ -67,8 +67,8 @@ def _cell_job(a):
 
 
 def tune():
-    """Choose the gate and the margin on DEVELOPMENT scenes (seeds 9,000,000 and up, never used for the results): the smallest margin whose accuracy of decided links
-    reaches reid_target_decided_acc over a mix of crowded and pair scenes, then the gate with the best decision rate. Written once, then frozen."""
+    """Choose the gate and the margin on DEVELOPMENT scenes (seeds 9,000,000 and up, never used for the results): the (gate, margin) with the highest PERSON-level link rate whose
+    person-level link accuracy reaches reid_target_decided_acc over a mix of crowded and pair scenes. Written once, then frozen."""
     target = rc.raw()["target_decided_acc"]; th = os.path.join(OUT, "thresholds.json")
     if os.path.isfile(th): print("thresholds already frozen:", open(th).read()); return
     mix = [(sp, pr, cr) for sp in (10, 5, 2) for pr in (0.0, 0.25, 0.5) for cr in (False, True)]
@@ -79,11 +79,11 @@ def tune():
             for k, (sp, pr, cr) in enumerate(mix):
                 cfg = rc.load("fixed", clock_sd=0.2, use_frozen=False); cfg.gate_sigma = gate; cfg.margin = margin
                 tot += run_cell(cfg, sp, pr, cr, 0.1, 20, 9_000_000 + 1000 * k).sum(0)
-            p = pooled(tot[None, :]); print(f"gate {gate} margin {margin}: decided acc {p['decided_acc']:.3f}, decision rate {p['decision_rate']:.3f}")
-            if p["decided_acc"] >= target and (best is None or p["decision_rate"] > best[0]): best = (p["decision_rate"], gate, margin, p["decided_acc"])
+            p = pooled(tot[None, :]); print(f"gate {gate} margin {margin}: person-link accuracy {p['person_link_acc']:.3f}, person-link rate {p['person_link_rate']:.3f}, all decisions (person or group) {p['decision_rate']:.3f}")
+            if p["person_link_acc"] >= target and (best is None or p["person_link_rate"] > best[0]): best = (p["person_link_rate"], gate, margin, p["person_link_acc"])
     if best is None: best = (0.0, 3.0, 16.0, float("nan"))
-    json.dump({"gate_sigma": best[1], "margin": best[2], "decision_rate_dev": best[0], "decided_acc_dev": best[3], "target": target, "dev_seed_base": 9_000_000,
-               "rule": "highest decision rate with decided accuracy >= target on development scenes"}, open(th, "w"), indent=1)
+    json.dump({"gate_sigma": best[1], "margin": best[2], "person_link_rate_dev": best[0], "person_link_acc_dev": best[3], "target": target, "dev_seed_base": 9_000_000,
+               "rule": "highest person-level link rate with person-level link accuracy >= target on development scenes"}, open(th, "w"), indent=1)
     print("frozen:", best)
 
 
@@ -104,7 +104,7 @@ def grid(n_scenes=300, procs=4):
     rows.sort(key=lambda r: r[0])
     with open(os.path.join(OUT, "reid_grid.csv"), "w", newline="") as f:
         w = csv.writer(f); head = ["camera_source", "spacing_m", "pairs_share", "position_error_m", "clock_offset_s", "crossing", "camera_dropout", "n_scenes", "label"]
-        mets = ["person_acc", "group_acc", "decision_rate", "decided_acc", "wrong_links_per_100", "idf1"]
+        mets = ["person_acc", "group_acc", "decision_rate", "decided_acc", "person_link_rate", "person_link_acc", "wrong_links_per_100", "idf1"]
         w.writerow(head + [x for m in mets for x in (m, m + "_lo", m + "_hi")])
         for key, p, ci in rows:
             w.writerow(list(key) + [n_scenes, "SIMULATED"] + [round(v, 4) for m in mets for v in (p[m], ci[m][0], ci[m][1])])

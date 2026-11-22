@@ -57,19 +57,31 @@ Filled by Claude Code on 22-23 Nov 2026 from the dataset files themselves. Every
 
 Window = one channel, T_clf_s long, marked in at least 50 % of the bitmap rows it covers, step half a window (`ai/brno_events.py`). Windows of one event overlap heavily and are NOT independent.
 
-## 5. Per class: recordings, events, windows (1 s and 2 s)
+## 5. How windows are cut, and per class: recordings, events, windows, real duration
 
-| Class | Recordings | Days | Annotated events | Events with a 1 s window | Windows 1 s | Events with a 2 s window | Windows 2 s | Evaluable on Brno |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| background | 1 | 1 | 4 | 4 | 42193 | 4 | 21150 | **no (1 recording)** |
-| climbing | 3 | 2 | 14 | 9 | 8713 | 3 | 4333 | yes |
-| digging | 1 | 1 | 2 | 2 | 10993 | 2 | 5496 | **no (1 recording)** |
-| other | 3 | 1 | 30 | 21 | 4670 | 14 | 1838 | yes |
-| running | 1 | 1 | 10 | 8 | 2824 | 8 | 1403 | **no (1 recording)** |
-| tampering | 1 | 1 | 23 | 14 | 3701 | 13 | 1712 | **no (1 recording)** |
-| vehicle | 4 | 2 | 18 | 17 | 11934 | 17 | 5926 | yes |
-| walking | 2 | 1 | 11 | 10 | 3895 | 10 | 1943 | yes |
-| animal | 0 | 0 | 0 | 0 | 0 | 0 | 0 | **no (absent: needs FEBUS data)** |
+**Cutting rule** (`ai/brno_events.py`, `ai/brno_windows.py`; the same rule for 1 s and 2 s):
+* **length** T_clf_s = 1 s (base, ASSUMED) or 2 s (sensitivity); the recording is 20 kHz, one bitmap row = 2,056 samples = 0.103 s, so a 1 s window covers 10 rows and a 2 s window 20 rows;
+* **channels per window: ONE.** A window is a single channel (1.02 m of fibre) over the window time; it is resampled to 510 Hz (510 samples for 1 s) before the features are computed;
+* **start and step:** a window starts at a bitmap row and the start moves by HALF a window (50 % overlap): every second window shares half its samples with the next one;
+* **which windows:** a (start row, channel) pair is kept if the bitmap marks that channel in at least 50 % of the rows the window covers; every kept window is assigned to the annotated event (curve) nearest to its centre;
+* in training the number of windows per event is capped (120, random, fixed seed) to bound the compute; the table below counts ALL candidate windows.
 
-**Reading:** a claim such as AC0 = 98 % needs at least 149 error-free independent events per class (protocol section 4); the largest class has 21 events. Brno cannot support such a claim for any class.
+**The number of windows is NOT the amount of data.** Neighbouring windows overlap in time (50 %) and in space (adjacent channels see the same source), and a single event is seen by many channels. The 42,193 windows of the background class come from ONE recording of 120 s. The independent units are the **events and the recordings**; the evaluation counts those only (protocol section 4).
 
+| Class | Recordings | Days | Real duration of the recordings (s) | Labelled time (s) | Annotated events | Events with a 1 s window | Windows 1 s | Events with a 2 s window | Windows 2 s | Evaluable on Brno |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| background | 1 | 1 | 120 | 76 | 4 | 4 | 42193 | 4 | 21150 | **no (1 recording)** |
+| climbing | 3 | 2 | 77 | 59 | 14 | 9 | 8713 | 3 | 4333 | yes |
+| digging | 1 | 1 | 52 | 51 | 2 | 2 | 10993 | 2 | 5496 | **no (1 recording)** |
+| other | 3 | 1 | 158 | 83 | 30 | 21 | 4670 | 14 | 1838 | yes |
+| running | 1 | 1 | 57 | 51 | 10 | 8 | 2824 | 8 | 1403 | **no (1 recording)** |
+| tampering | 1 | 1 | 77 | 54 | 23 | 14 | 3701 | 13 | 1712 | **no (1 recording)** |
+| vehicle | 4 | 2 | 260 | 112 | 18 | 17 | 11934 | 17 | 5926 | yes |
+| walking | 2 | 1 | 187 | 149 | 11 | 10 | 3895 | 10 | 1943 | yes |
+| animal | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | **no (absent: needs FEBUS data)** |
+
+All 16 recordings together last 987 s (16.5 minutes) and one class (background) has 120 s: the whole labelled dataset is a few minutes of fibre time.
+
+**Background false alarms (protocol section 1, operational number).** The background class is ONE recording of 120 s; its last 20 % is 24 s. Even if no alarm-class event is predicted there, 24 s over about 1.7 km (about 5e-4 km-days) gives a rule-of-three upper bound of thousands of alarms per km per day: **24 s prove nothing about false alarms.** The operational false-alarm rate needs at least **30 km-days of clean FEBUS background with zero false alarms to show an upper bound of 0.1 per km per day** (3 / 30). The Brno diagnostic value is reported only as "same recording, optimistic".
+
+**Reading:** a claim such as AC0 = 98 % needs at least 149 error-free independent events per class (protocol section 4); the largest class has 17 events with a 1 s window. Even if all 17 were classified correctly, the one-sided 95 % exact lower bound on recall is 0.05^(1/17) = **83.8 %**: Brno can show that the classifier works, not that it reaches 98 %; the real number has to come from FEBUS.

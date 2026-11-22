@@ -1,0 +1,37 @@
+{
+ "label": "SIMULATED: all errors and population spreads are ASSUMED (drone position error 1.5 / 2.5 m PROXY from Nalamothu et al. 2024, 5 m ASSUMED)",
+ "thresholds": {
+  "gate_sigma": 4.0,
+  "margin": 2.0,
+  "scope": "ONE setting for the whole grid and for all four camera sources, chosen once on development scenes (seed base 9,000,000; fixed camera 1 m, clock 0.2 s, 10 % dropout, spacing 10/5/2, pairs 0/25/50 %)"
+ },
+ "cells": 1296,
+ "scenes_per_cell": 300,
+ "bootstrap": "scene bootstrap, 2000 resamples, 95 %",
+ "below_0.97": {
+  "fixed": {
+   "cells": 648,
+   "point_below": 228,
+   "lower_ci_below": 265,
+   "min_point": 0.8396
+  },
+  "drone_optimistic": {
+   "cells": 216,
+   "point_below": 86,
+   "lower_ci_below": 94,
+   "min_point": 0.8897
+  },
+  "drone_base": {
+   "cells": 216,
+   "point_below": 98,
+   "lower_ci_below": 109,
+   "min_point": 0.8619
+  },
+  "drone_pessimistic": {
+   "cells": 216,
+   "point_below": 121,
+   "lower_ci_below": 131,
+   "min_point": 0.8546
+  }
+ }
+}

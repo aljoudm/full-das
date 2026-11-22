@@ -1,0 +1,9 @@
+{
+ "gate_sigma": 4.0,
+ "margin": 2.0,
+ "person_link_rate_dev": 0.6110185185185185,
+ "person_link_acc_dev": 0.9784058190634944,
+ "target": 0.97,
+ "dev_seed_base": 9000000,
+ "rule": "highest person-level link rate with person-level link accuracy >= target on development scenes"
+}

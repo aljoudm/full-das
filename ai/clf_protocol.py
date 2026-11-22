@@ -132,6 +132,14 @@ def main():
     print(f"balanced accuracy {ba:.3f}  cluster bootstrap 95 % [{ci_ba[0]:.3f}, {ci_ba[1]:.3f}]  (only {ntest_rec} test recordings: the bootstrap interval is too narrow; Clopper-Pearson on events below)")
     for c in present:
         print(f"  {cc.CLASSES[c]:9s} recall {rec[c]:.3f} [{cp[c][0]:.3f}, {cp[c][1]:.3f}] Clopper-Pearson, {int((yt == c).sum())} events, {len(set(er[yt == c]))} recording(s); precision {prec[c]:.3f}")
+    per_rec = {}
+    for r_ in sorted(set(er)):
+        mm = er == r_; per_rec[r_] = {"class": cc.CLASSES[int(yt[mm][0])], "n_events": int(mm.sum()), "events_correct": int((yt[mm] == yp[mm]).sum()), "recall": float((yt[mm] == yp[mm]).mean()),
+                                      "predicted": {cc.CLASSES[c]: int((yp[mm] == c).sum()) for c in set(yp[mm].tolist())}}
+        print(f"  test recording {r_[:34]:34s} class {per_rec[r_]['class']:9s}: {per_rec[r_]['events_correct']} of {per_rec[r_]['n_events']} events correct, predicted {per_rec[r_]['predicted']}")
+    ceil_ = {cc.CLASSES[c]: float(0.05 ** (1.0 / int((yt == c).sum()))) for c in present}
+    print("  best possible one-sided 95 % lower bound on recall if every test event of the class were correct (0.05^(1/n)):", {k: round(v, 3) for k, v in ceil_.items()})
+    print(f"  THE LOCKED TEST HAS ONLY {ntest_rec} RECORDINGS: the cluster bootstrap is not meaningful; Clopper-Pearson on events and the per-recording results above are what counts.")
     # ---- 3) descriptive development folds
     fold_res = []
     for k, v in folds.items():
@@ -180,7 +188,7 @@ def main():
                          "recall": {cc.CLASSES[c]: {"value": rec[c], "clopper_pearson_95": cp[c], "cluster_bootstrap_95": ci_rec[c], "n_events": int((yt == c).sum()), "n_recordings": len(set(er[yt == c]))} for c in present},
                          "precision": {cc.CLASSES[c]: prec[c] for c in present}, "macro_f1": float(np.mean([f1[c] for c in present])), "ece": e_ece, "unknown_share": 0.0,
                          "note": f"only {ntest_rec} test recordings: the cluster bootstrap interval is too narrow; use Clopper-Pearson on events. Far below the several hundred events per class that a 98 % claim needs."},
-         "development_folds_descriptive": fold_res, "diagnostic_random_window_split": {"window_accuracy_random": acc_rand_win, "window_accuracy_grouped_locked_test": acc_grp_win, "label": "[DIAGNOSTIC] window level, run once"},
+         "per_test_recording": per_rec, "max_provable_recall_lower_bound_if_all_correct": ceil_, "development_folds_descriptive": fold_res, "diagnostic_random_window_split": {"window_accuracy_random": acc_rand_win, "window_accuracy_grouped_locked_test": acc_grp_win, "label": "[DIAGNOSTIC] window level, run once"},
          "diagnostic_single_recording_classes": diag, "diagnostic_background_false_alarms": bgf, "not_evaluable_on_brno": SPLIT["not_evaluable_on_brno"], "commit": commit, "model_checksum_sha256": ck, "seconds": time.time() - t0}
     json.dump(M, open(os.path.join(OUT, "metrics.json"), "w"), indent=1)
     import matplotlib; matplotlib.use("Agg"); import matplotlib.pyplot as plt
@@ -197,6 +205,7 @@ def main():
 * Evaluation: event level, balanced accuracy {ba:.3f} over {len(present)} evaluable classes, {len(yt)} test events from {ntest_rec} recordings; intervals in metrics.json. Classes with one recording are not evaluable on Brno.
 * Preprocessing and class weights are fitted on the development recordings only; no hyper-parameter was tuned (fixed: 3 layers, d = 64, {EPOCHS} epochs).
 * **Running is an alarm class that is NOT evaluated on Brno** (1 recording; same for digging = construction, tampering, background): it stays in training and has priority when FEBUS data are collected. Balanced accuracy and macro F1 are over the {len(present)} evaluable classes only ({', '.join(cc.CLASSES[c] for c in present)}); an event of an evaluable class predicted as a single-recording class counts as an error of its true class.
+* **Only {ntest_rec} test recordings.** Per-recording results and Clopper-Pearson intervals on events are in metrics.json; the cluster bootstrap is not meaningful with so few recordings. Even if every event of the largest class were correct, the one-sided 95 % lower bound on recall would be at most {max(ceil_.values()):.3f} (0.05^(1/n), n = events of that class): Brno shows that the classifier works, the real accuracy has to come from FEBUS.
 * Known limits: very few events per class; one site and one interrogator; windows of an event are correlated; confidence is not calibrated beyond the reliability plot; no unknown option.
 * Commit {commit}; model checksum {ck}.
 """)
