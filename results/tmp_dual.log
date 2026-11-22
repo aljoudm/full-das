@@ -1,0 +1,16 @@
+
+	Trial License -- for use to evaluate programs for possible purchase as an end-user only.
+
+build_das_library: loaded C:\Users\aljou\OneDrive\Desktop\full das\results\das_library.mat
+get_allocation: loaded C:\Users\aljou\OneDrive\Desktop\full das\results\alloc_medium_22.mat
+
+=== dual_verify = 0 ===
+false alarms reaching a patrol: 0.2117 per km per day (30.8 per day); of which drone-cued 0.0357 per km per day (5.2 per day); target 0.01
+true alarms with a patrol reached: 87.4 % (707 of 809); median alarm-to-patrol 705 s; median verification time 501 s (drone-cued true alarms: 507 s); verified within T_resp: all 38.9 %, Hot 51.5 %
+true alarms with no asset at all: 2; with a single check because no second drone was ready: 0
+
+=== dual_verify = 1 ===
+false alarms reaching a patrol: 0.2138 per km per day (31.1 per day); of which drone-cued 0.0321 per km per day (4.7 per day); target 0.01
+true alarms with a patrol reached: 63.4 % (472 of 745); median alarm-to-patrol 1049 s; median verification time 893 s (drone-cued true alarms: 904 s); verified within T_resp: all 21.9 %, Hot 28.3 %
+true alarms with no asset at all: 159; with a single check because no second drone was ready: 0
+done

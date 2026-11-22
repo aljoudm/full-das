@@ -32,34 +32,36 @@ cam = A.sites([A.sites.in]);   cx = [cam.x]';   cy = [cam.y]';   halfCov = v.Cov
 sx = alloc.drones.station_xy(:, 1);   sy = alloc.drones.station_xy(:, 2);   nDr = alloc.drones.n(:);   free = arrayfun(@(k) zeros(1, k), nDr, 'UniformOutput', false);   % time each drone is free again
 nP = alloc.scenario.N_patrol;   [px, py] = patrol_sites(A, nP);   pfree = zeros(nP, 1);
 Pc_dr = v.Pc_drone;   Pc_cc = v.Pc_CCTV;
+dualMode = 0;   if isfield(f, 'dual_verify'), dualMode = f.dual_verify; end      % 0 single check; 1 dual everywhere; 2 dual in Neutral and Cold only, single in Hot
 [~, ord] = sort(ev.t_start);
 for k = ord(:)'
     if ~R.alarm(k), continue; end
     ta = R.t_alarm(k);   xh = obs.x_hat(k);   yh = obs.y_hat(k);
-    dcam = min(hypot(cx - xh, cy - yh));
+    dcam = min(hypot(cx - xh, cy - yh));   wantDual = ~R.site_routed(k) && (dualMode == 1 || (dualMode == 2 && R.zone(k) ~= 3));
+    tFirst = NaN;
     if R.site_routed(k)
-        R.asset(k) = "site";   R.t_verif(k) = ta + f.t_cam_s;   Pc = Pc_cc;                    % site guard + the site's existing cameras
+        R.asset(k) = "site";   tFirst = f.t_cam_s;   Pc = Pc_cc;                              % site guard + the site's existing cameras
     elseif dcam <= halfCov
-        R.asset(k) = "camera";   R.t_verif(k) = ta + f.t_cam_s;   R.d_asset_m(k) = dcam;   Pc = Pc_cc;
+        R.asset(k) = "camera";   tFirst = f.t_cam_s;   R.d_asset_m(k) = dcam;   Pc = Pc_cc;
     else
-        best = inf;   bs = 0;
-        for st = 1:numel(sx)
-            if ~any(free{st} <= ta), continue; end
-            tt = v.T_launch_s + hypot(sx(st) - xh, sy(st) - yh) / v.v_drone_ms;
-            if tt < best, best = tt;   bs = st; end
-        end
-        if bs > 0
-            j = find(free{bs} <= ta, 1);   dd = hypot(sx(bs) - xh, sy(bs) - yh);
-            free{bs}(j) = ta + best + dd / v.v_drone_ms + f.T_mission_s + v.T_charge_min * 60;
-            R.asset(k) = "drone";   R.t_verif(k) = ta + best;   R.station(k) = bs;   R.d_asset_m(k) = dd;   Pc = Pc_dr;
-        else
-            R.asset(k) = "none";   continue;
-        end
+        [best, bs] = pick_drone(free, ta, sx, sy, xh, yh, v);
+        if bs == 0, R.asset(k) = "none";   continue; end
+        [free, dd] = reserve(free, bs, ta, best, sx, sy, xh, yh, v, f);
+        R.asset(k) = "drone";   tFirst = best;   R.station(k) = bs;   R.d_asset_m(k) = dd;   Pc = Pc_dr;
     end
-    R.verif_dt(k) = R.t_verif(k) - ta;   R.in_Tresp(k) = R.verif_dt(k) <= v.T_resp_s;
-    if ev.is_intrusion(k), R.confirmed(k) = rand(s) <= Pc;
-    elseif R.site_routed(k), R.confirmed(k) = rand(s) > f.p_site_clear;        % authorized traffic at a guarded site: cleared with p_site_clear (PLACEHOLDER)
-    else, R.confirmed(k) = rand(s) > Pc; end
+    second = false;   tSecond = 0;
+    if wantDual                                                      % second INDEPENDENT check: a drone (after a camera) or another drone (after a drone)
+        [best2, bs2] = pick_drone(free, ta, sx, sy, xh, yh, v);
+        if bs2 > 0, [free, ~] = reserve(free, bs2, ta, best2, sx, sy, xh, yh, v, f);   second = true;   tSecond = best2;
+        else, R.asset(k) = R.asset(k) + " (single: no second drone ready)"; end
+    end
+    R.t_verif(k) = ta + max(tFirst, tSecond);   R.verif_dt(k) = R.t_verif(k) - ta;   R.in_Tresp(k) = R.verif_dt(k) <= v.T_resp_s;
+    if ev.is_intrusion(k), c1 = rand(s) <= Pc;
+    elseif R.site_routed(k), c1 = rand(s) > f.p_site_clear;           % authorized traffic at a guarded site: cleared with p_site_clear (PLACEHOLDER)
+    else, c1 = rand(s) > Pc; end
+    if second && c1 && ev.is_intrusion(k), c1 = rand(s) <= Pc_dr;
+    elseif second && c1, c1 = rand(s) > Pc_dr; end                    % both checks must confirm
+    R.confirmed(k) = c1;
     if R.confirmed(k)
         d = hypot(px - xh, py - yh);   d(pfree > R.t_verif(k)) = inf;   [dm, ip] = min(d);
         if isfinite(dm)
@@ -74,4 +76,20 @@ function [px, py] = patrol_sites(A, n)
 % patrol home positions: the checkpoints first, then interdiction points, round robin (existing assets; positions ASSUMED)
 cs = A.sites([A.sites.in]);   isCp = string({cs.kind}) == "checkpoint";   cs = [cs(isCp), cs(~isCp)];
 idx = mod((0:n-1), numel(cs)) + 1;   px = [cs(idx).x]';   py = [cs(idx).y]';
+end
+
+function [best, bs] = pick_drone(free, ta, sx, sy, xh, yh, v)
+% ready drone with the shortest arrival time (launch + flight); bs = 0 if no station has a ready drone
+best = inf;   bs = 0;
+for st = 1:numel(sx)
+    if ~any(free{st} <= ta), continue; end
+    tt = v.T_launch_s + hypot(sx(st) - xh, sy(st) - yh) / v.v_drone_ms;
+    if tt < best, best = tt;   bs = st; end
+end
+end
+
+function [free, dd] = reserve(free, bs, ta, best, sx, sy, xh, yh, v, f)
+% the drone is busy for the flight out and back, the mission and the full charge
+j = find(free{bs} <= ta, 1);   dd = hypot(sx(bs) - xh, sy(bs) - yh);
+free{bs}(j) = ta + best + dd / v.v_drone_ms + f.T_mission_s + v.T_charge_min * 60;
 end

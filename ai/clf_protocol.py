@@ -159,6 +159,19 @@ def main():
         for c in sorted(set(a.tolist())):
             diag[cc.CLASSES[c]] = {"events": int((a == c).sum()), "recall": float(((a == c) & (b == c)).sum() / (a == c).sum()), "label": "[DIAGNOSTIC - SAME RECORDING] same recording, optimistic"}
             print(f"[DIAGNOSTIC - SAME RECORDING, optimistic] {cc.CLASSES[c]}: {diag[cc.CLASSES[c]]['events']} events in the last 20 % of the recording, recall {diag[cc.CLASSES[c]]['recall']:.2f} (not evaluable on Brno: 1 recording; trained on the first 80 % with a 2-window gap)")
+    # ---- 4c) false alarms on the BACKGROUND recording (last 20 % after the gap), alarms per km per day: [DIAGNOSTIC - SAME RECORDING], same recording, optimistic
+    bgf = {}
+    if "no_event" in single:
+        chan_all = np.concatenate([D[n]["chan"] for n in dev if len(D[n]["X"])]); bgm = tem & (ys == cc.CLASSES.index("no_event"))
+        if bgm.any():
+            ab, bb, _, _, _ = event_level(Pt[(tem[tem]) & (ys[tem] == cc.CLASSES.index("no_event"))], ys[bgm], es[bgm], rs[bgm])
+            alarm_idx = [cc.CLASSES.index(c) for c in ALARM]; n_alarm = int(np.isin(bb, alarm_idx).sum())
+            nbg = [n for n in dev if cc.FOLDER_TO_CLASS[str(D[n]["folder"])] == "no_event"][0]; spr = int(D[nbg]["spr"]); rr_ = rows[bgm]
+            k = int(np.ceil(cc.T_CLF * 20000 / spr)); secs = (rr_.max() + k - rr_.min()) * spr / 20000.0
+            km = len(set(chan_all[bgm])) * 1.0209523 / 1000.0; days = secs / 86400.0; kd = km * days
+            bgf = {"label": "[DIAGNOSTIC - SAME RECORDING] same recording, optimistic", "background_events": int(len(ab)), "alarm_class_events": n_alarm, "monitored_km": km, "duration_s": secs, "km_days": kd,
+                   "alarms_per_km_per_day": n_alarm / kd, "rule_of_three_upper_95_per_km_day": (3.0 / kd if n_alarm == 0 else None)}
+            print(f"[DIAGNOSTIC - SAME RECORDING, optimistic] background false alarms: {n_alarm} alarm-class events of {len(ab)} background events over {km:.2f} km x {secs:.0f} s = {kd:.2e} km-days -> {n_alarm / kd:.0f} alarms/km/day" + (f"; rule of three: upper bound {3.0 / kd:.0f} per km per day (useless: far too little background)" if n_alarm == 0 else ""))
     # ---- 5) files
     commit = subprocess.run(["git", "-C", cc.ROOT, "rev-parse", "HEAD"], capture_output=True, text=True).stdout.strip()
     ck = hashlib.sha256(b"".join(p.detach().numpy().tobytes() for p in m.parameters())).hexdigest()
@@ -168,7 +181,7 @@ def main():
                          "precision": {cc.CLASSES[c]: prec[c] for c in present}, "macro_f1": float(np.mean([f1[c] for c in present])), "ece": e_ece, "unknown_share": 0.0,
                          "note": f"only {ntest_rec} test recordings: the cluster bootstrap interval is too narrow; use Clopper-Pearson on events. Far below the several hundred events per class that a 98 % claim needs."},
          "development_folds_descriptive": fold_res, "diagnostic_random_window_split": {"window_accuracy_random": acc_rand_win, "window_accuracy_grouped_locked_test": acc_grp_win, "label": "[DIAGNOSTIC] window level, run once"},
-         "diagnostic_single_recording_classes": diag, "not_evaluable_on_brno": SPLIT["not_evaluable_on_brno"], "commit": commit, "model_checksum_sha256": ck, "seconds": time.time() - t0}
+         "diagnostic_single_recording_classes": diag, "diagnostic_background_false_alarms": bgf, "not_evaluable_on_brno": SPLIT["not_evaluable_on_brno"], "commit": commit, "model_checksum_sha256": ck, "seconds": time.time() - t0}
     json.dump(M, open(os.path.join(OUT, "metrics.json"), "w"), indent=1)
     import matplotlib; matplotlib.use("Agg"); import matplotlib.pyplot as plt
     edges = np.linspace(0, 1, 6); xs, ys_ = [], []
