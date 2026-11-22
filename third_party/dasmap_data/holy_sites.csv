@@ -1,0 +1,6 @@
+name,lat,lon,dx,dy,dz,osm_ref
+Masjid al-Haram,21.4247236,39.8239317,-5.5,-2.0,-1.8,relation/12787867 (building centre)
+Jamarat,21.4207809,39.8726799,1.3,0,2.0,way/440922995 (Jamaraat Bridge centre)
+Mina,21.4153556,39.8925058,1.8,0,-0.8,node/7758270150
+Muzdalifah,21.3863464,39.9151466,0,0,0,node/4543956102
+Arafat,21.3547998,39.9841015,-1.1,0,0,node/1236463804 (Jabal ar Rahmah)

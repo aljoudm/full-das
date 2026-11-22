@@ -1,0 +1,8 @@
+*.asv
+*.autosave
+slprj/
+results/tmp/
+results/*.mp4
+__pycache__/
+*.pyc
+.venv/
