@@ -29,7 +29,7 @@ def table_value(sym):
 
 
 FS = table_value("fs_win_hz")            # 510 Hz
-T_CLF = table_value("T_clf_s")           # 1.0 s
+T_CLF = float(os.environ.get("T_CLF_S", table_value("T_clf_s")))   # 1.0 s (PLACEHOLDER); env T_CLF_S overrides it for the 1 s vs 2 s comparison
 N = int(round(FS * T_CLF))               # samples per window
 
 

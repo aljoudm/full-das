@@ -56,6 +56,25 @@ def fit_predict(Xtr, ytr, Xte, epochs=EPOCHS, Xva=None, yva=None):
     return pred, (m, mu, sd)
 
 
+def wilson(k, n, z=1.96):
+    p = k / n; d = 1 + z * z / n; c = p + z * z / (2 * n); h = z * np.sqrt(p * (1 - p) / n + z * z / (4 * n * n))
+    return (c - h) / d, (c + h) / d
+
+
+def boot_ci(yt, yp, grp, B=1000, seed=0):
+    """95 % bootstrap CI over GROUPS (recordings / time blocks): resample the groups with replacement, recompute pooled accuracy and per-class recall."""
+    rng = np.random.default_rng(seed); gs = np.array(sorted(set(grp), key=str), dtype=object); ok = (yt == yp)
+    idx = {g: np.nonzero(grp == g)[0] for g in gs}; acc = []; rec = [[] for _ in range(NC)]
+    for _ in range(B):
+        pick = rng.choice(len(gs), len(gs)); ii = np.concatenate([idx[gs[i]] for i in pick])
+        acc.append(ok[ii].mean())
+        for c in range(NC):
+            m = yt[ii] == c
+            if m.any(): rec[c].append(ok[ii][m].mean())
+    q = lambda v: (float(np.percentile(v, 2.5)), float(np.percentile(v, 97.5))) if len(v) else (float('nan'), float('nan'))
+    return {"acc": q(acc), "recall": [q(r) for r in rec], "n_groups": int(len(gs))}
+
+
 def load():
     X, y, rec, row, frac = [], [], [], [], []
     for p in sorted(glob.glob(os.path.join(WIN, "*.npz"))):
@@ -90,6 +109,7 @@ def main():
     fold_of = {}
     for c in range(NC):
         for j, g in enumerate([g for g in groups if gcls[g] == c]): fold_of[g] = j % 3
+    P_true, P_pred, P_grp = [], [], []
     conf = np.zeros((NC, NC), int); conf_single = np.zeros((NC, NC), int); conf_cross = np.zeros((NC, NC), int); fold_acc = []
     log = []
     for k in range(3):
@@ -100,18 +120,29 @@ def main():
         assert not (te_r & tr_rec_whole), "a whole recording is in both train and test"
         pr, _ = fit_predict(X[tr_m], y[tr_m], X[te_m]); yt = y[te_m]; acc = float((pr == yt).mean()); fold_acc.append(acc)
         for a, b, g in zip(yt, pr, group[te_m]):
+            P_true.append(a); P_pred.append(b); P_grp.append(g)
             conf[a, b] += 1
             (conf_single if a in single else conf_cross)[a, b] += 1
+        for c in range(NC):
+            gs = sorted(set(g for g in group[te_m] if gcls[g] == c))
+            if gs: print(f"    fold {k} test {cc.CLASSES[c]:9s}: {len(gs)} group(s) {gs}, {int((yt == c).sum())} windows" + ("   [SAME RECORDING, TEMPORAL SPLIT]" if c in single else ""))
         print(f"fold {k}: test groups {sorted(te_g)} | train {len(tr_g)} groups | {int(tr_m.sum())} train / {int(te_m.sum())} test windows | accuracy {acc:.3f}")
         log.append({"fold": k, "test_groups": sorted(te_g), "n_train": int(tr_m.sum()), "n_test": int(te_m.sum()), "accuracy": acc})
+    P_true, P_pred, P_grp = np.array(P_true), np.array(P_pred), np.array(P_grp, dtype=object)
     acc_grp = float(np.trace(conf) / conf.sum())
+    ci = boot_ci(P_true, P_pred, P_grp)
+    print("bootstrap over groups (recordings / time blocks), 95 % CI, 1000 resamples:")
+    print(f"  pooled accuracy {acc_grp:.3f}  [{ci['acc'][0]:.3f}, {ci['acc'][1]:.3f}]  ({len(set(P_grp))} test groups)")
+    for c in range(NC):
+        n_g = len(set(P_grp[P_true == c]));   lo, hi = ci['recall'][c]
+        print(f"  recall {cc.CLASSES[c]:9s} {(P_pred[P_true == c] == c).mean() if n_g else float('nan'):.3f}  [{lo:.3f}, {hi:.3f}]  groups {n_g}, windows {int((P_true == c).sum())}" + ("   [SAME RECORDING, TEMPORAL SPLIT]" if c in single else ""))
     print(f"GROUPED pooled accuracy {acc_grp:.3f}  (cross-recording classes only: {np.trace(conf_cross) / max(conf_cross.sum(), 1):.3f}; "
           f"single-recording time-block classes only: {np.trace(conf_single) / max(conf_single.sum(), 1):.3f})")
     print("inflation of the random protocol over the grouped one: %.1f percentage points" % (100 * (acc_rand - acc_grp)))
     rown = conf / np.maximum(conf.sum(1, keepdims=True), 1)
     print("confusion (rows true, cols predicted, row-normalised):"); print("          " + " ".join(f"{c[:7]:>8s}" for c in cc.CLASSES))
     for i, c in enumerate(cc.CLASSES): print(f"{c:9s} " + " ".join(f"{v:8.2f}" for v in rown[i]))
-    json.dump({"classes": cc.CLASSES, "counts": conf.tolist(), "row_normalised": rown.tolist(), "accuracy_grouped": acc_grp, "accuracy_random": acc_rand,
+    json.dump({"classes": cc.CLASSES, "counts": conf.tolist(), "row_normalised": rown.tolist(), "accuracy_grouped": acc_grp, "ci95_grouped": ci, "random_wilson95": [wl, wh], "accuracy_random": acc_rand,
                "accuracy_grouped_cross_recording": float(np.trace(conf_cross) / max(conf_cross.sum(), 1)),
                "accuracy_grouped_single_recording_blocks": float(np.trace(conf_single) / max(conf_single.sum(), 1)), "single_recording_classes": [cc.CLASSES[c] for c in sorted(single)],
                "folds": log, "epochs": EPOCHS, "fs_hz": cc.FS, "window_s": cc.T_CLF, "features": cc.FEAT_LEN, "n_windows": int(keep.sum()),
