@@ -1,0 +1,247 @@
+{
+ "protocol": "docs/Classifier_Evaluation_Protocol.pdf",
+ "window_s": 2.0,
+ "fs_hz": 510.0,
+ "epochs": 30,
+ "level": "event (mean probability over the windows of an event)",
+ "locked_test": {
+  "n_events": 10,
+  "n_recordings": 4,
+  "classes": [
+   "walking",
+   "vehicle",
+   "climbing",
+   "other"
+  ],
+  "headline_classes": [
+   "walking",
+   "vehicle",
+   "climbing",
+   "other"
+  ],
+  "n_headline_classes": 4,
+  "headline_note": "balanced accuracy and macro F1 are over these evaluable classes only; running, digging, background and tampering (1 recording each) stay in training but are out of the headline; an evaluable-class event predicted as one of them counts as an error of its true class",
+  "balanced_accuracy": 0.75,
+  "balanced_accuracy_cluster_bootstrap_95": [
+   0.5,
+   1.0
+  ],
+  "recall": {
+   "walking": {
+    "value": 1.0,
+    "clopper_pearson_95": [
+     0.3976353643835253,
+     1.0
+    ],
+    "cluster_bootstrap_95": [
+     1.0,
+     1.0
+    ],
+    "n_events": 4,
+    "n_recordings": 1
+   },
+   "vehicle": {
+    "value": 1.0,
+    "clopper_pearson_95": [
+     0.15811388300841897,
+     1.0
+    ],
+    "cluster_bootstrap_95": [
+     1.0,
+     1.0
+    ],
+    "n_events": 2,
+    "n_recordings": 1
+   },
+   "climbing": {
+    "value": 0.0,
+    "clopper_pearson_95": [
+     0.0,
+     0.975
+    ],
+    "cluster_bootstrap_95": [
+     0.0,
+     0.0
+    ],
+    "n_events": 1,
+    "n_recordings": 1
+   },
+   "other": {
+    "value": 1.0,
+    "clopper_pearson_95": [
+     0.2924017738212866,
+     1.0
+    ],
+    "cluster_bootstrap_95": [
+     1.0,
+     1.0
+    ],
+    "n_events": 3,
+    "n_recordings": 1
+   }
+  },
+  "precision": {
+   "walking": 1.0,
+   "vehicle": 1.0,
+   "climbing": NaN,
+   "other": 1.0
+  },
+  "macro_f1": 0.75,
+  "ece": 0.21800970733165737,
+  "unknown_share": 0.0,
+  "note": "only 4 test recordings: the cluster bootstrap interval is too narrow; use Clopper-Pearson on events. Far below the several hundred events per class that a 98 % claim needs."
+ },
+ "per_test_recording": {
+  "auto4_2023-06-06T144655+0100": {
+   "class": "vehicle",
+   "n_events": 2,
+   "events_correct": 2,
+   "recall": 1.0,
+   "predicted": {
+    "vehicle": 2
+   }
+  },
+  "fence_2023-04-17T123117+0100": {
+   "class": "climbing",
+   "n_events": 1,
+   "events_correct": 0,
+   "recall": 0.0,
+   "predicted": {
+    "no_event": 1
+   }
+  },
+  "longboard_2023-04-17T123543+0100": {
+   "class": "other",
+   "n_events": 3,
+   "events_correct": 3,
+   "recall": 1.0,
+   "predicted": {
+    "other": 3
+   }
+  },
+  "walking_2023-04-17T121933+0100": {
+   "class": "walking",
+   "n_events": 4,
+   "events_correct": 4,
+   "recall": 1.0,
+   "predicted": {
+    "walking": 4
+   }
+  }
+ },
+ "max_provable_recall_lower_bound_if_all_correct": {
+  "walking": 0.4728708045015879,
+  "vehicle": 0.22360679774997896,
+  "climbing": 0.05,
+  "other": 0.3684031498640387
+ },
+ "development_folds_descriptive": [
+  {
+   "fold": "0",
+   "recordings": [
+    "regularshit_2023-04-17T130103+0100",
+    "openingclosing_2023-04-17T122658+0100",
+    "auto2_2023-04-17T124510+0100"
+   ],
+   "events": 14,
+   "event_accuracy": 0.42857142857142855,
+   "classes_without_training_recording": [
+    "no_event"
+   ]
+  },
+  {
+   "fold": "1",
+   "recordings": [
+    "plot_2023-11-07T150119Z",
+    "running_2023-04-17T122413+0100",
+    "walking2_2023-04-17T122153+0100"
+   ],
+   "events": 15,
+   "event_accuracy": 0.0,
+   "classes_without_training_recording": [
+    "walking",
+    "running"
+   ]
+  },
+  {
+   "fold": "2",
+   "recordings": [
+    "kopani_plot_2023-11-07T150207Z",
+    "manipulation_2023-04-17T122847+0100"
+   ],
+   "events": 14,
+   "event_accuracy": 0.0,
+   "classes_without_training_recording": [
+    "tampering"
+   ]
+  },
+  {
+   "fold": "3",
+   "recordings": [
+    "reconstruction1_2023-06-06T150714+0100",
+    "auto_2023-04-17T124152+0100"
+   ],
+   "events": 6,
+   "event_accuracy": 0.6666666666666666,
+   "classes_without_training_recording": [
+    "digging"
+   ]
+  },
+  {
+   "fold": "4",
+   "recordings": [
+    "longboardroad_2023-04-17T123638+0100",
+    "auto4_2023-06-06T145055+0100"
+   ],
+   "events": 12,
+   "event_accuracy": 0.3333333333333333,
+   "classes_without_training_recording": []
+  }
+ ],
+ "diagnostic_random_window_split": {
+  "window_accuracy_random": 0.8068376068376069,
+  "window_accuracy_grouped_locked_test": 0.6790582403965304,
+  "label": "[DIAGNOSTIC] window level, run once"
+ },
+ "diagnostic_single_recording_classes": {
+  "running": {
+   "events": 2,
+   "recall": 1.0,
+   "label": "[DIAGNOSTIC - SAME RECORDING] same recording, optimistic"
+  },
+  "digging": {
+   "events": 2,
+   "recall": 1.0,
+   "label": "[DIAGNOSTIC - SAME RECORDING] same recording, optimistic"
+  },
+  "tampering": {
+   "events": 3,
+   "recall": 0.3333333333333333,
+   "label": "[DIAGNOSTIC - SAME RECORDING] same recording, optimistic"
+  },
+  "no_event": {
+   "events": 1,
+   "recall": 1.0,
+   "label": "[DIAGNOSTIC - SAME RECORDING] same recording, optimistic"
+  }
+ },
+ "diagnostic_background_false_alarms": {
+  "label": "[DIAGNOSTIC - SAME RECORDING] same recording, optimistic",
+  "background_events": 1,
+  "alarm_class_events": 0,
+  "monitored_km": 0.07350856559999999,
+  "duration_s": 18.441,
+  "km_days": 1.5689484470249998e-05,
+  "alarms_per_km_per_day": 0.0,
+  "rule_of_three_upper_95_per_km_day": 191210.87156741982
+ },
+ "not_evaluable_on_brno": {
+  "background": "1 recording",
+  "digging": "1 recording",
+  "running": "1 recording",
+  "tampering": "1 recording"
+ },
+ "commit": "f0ad8e4bfaf61e34231caf507117a9846b364175",
+ "model_checksum_sha256": "e5b2ff8845b31809142d9e3e31bc938e5b581cf17d6f0728e41b92ca79680993",
+ "seconds": 1218.4122421741486
+}
