@@ -1,0 +1,11 @@
+{
+  "use_real_ai": false,
+  "classifier": {
+    "mode": "uniform",
+    "comment": "TEMPORARY stub. mode 'uniform': correct with probability Pc, errors spread equally over the other classes (PLACEHOLDER shape). mode 'confusion': draw the output class from the row of the confusion matrix in confusion_file (e.g. results/classifier/confusion_grouped.json from the Brno test). Change only this file to switch; no code edit.",
+    "Pc": 0.983,
+    "Pc_source": "Pc_DAS of the parameter table, low end of 0.983 to 0.993 (wang2024); 0.993 is the high-end sensitivity",
+    "confusion_file": ""
+  },
+  "reidentify": { "mode": "stub", "comment": "added in the profiling stage" }
+}

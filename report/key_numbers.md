@@ -51,3 +51,14 @@ The height method (Engyom/DAS- v2.2-sim) needs a walker, parallel to the fibre w
 | 10 % | 49.7 % | 4.7 % | 4.1 % | 88.1 % | 0.0 % | 8.3 % |
 | 30 % | 49.4 % | 15.2 % | 13.4 % | 87.9 % | 0.0 % | 27.0 % |
 Reasons a walker is not measurable (p_along 10 %): crossing 84.5 %, not detected 6.5 %, lane farther than 3 m 0.7 %. Height is a secondary, exploratory indicator (+/- 8 cm); the primary claim is stride, speed and cadence.
+
+## Stage 6: alarm -> cue -> verification -> patrol (`tests/test_stage6.m`, 20 simulated days per scenario, seed 606, 22 interdiction sites; TEMPORARY classifier stub, Pc = 0.983 with errors spread equally: PLACEHOLDER)
+Detection-to-alert time = T_win 2.0 s + t_proc 1.0 s (PLACEHOLDER) + t_ai 0.13 s = **3.13 s** (T_alert of the table is TBD).
+| Scenario (drones) | intrusions / 20 days | true alarms: camera / drone / no asset | verified within T_resp (all / Hot) | median verification time | patrol reached (median alarm-to-patrol) |
+| --- | --- | --- | --- | --- | --- |
+| low (3) | 452 | 6 / 342 / 87 | 22.3 % / 28.1 % (of 263 Hot) | 967 s | 72.9 % (1475 s) |
+| medium (6) | 453 | 2 / 426 / 0 | 33.9 % / 48.7 % (of 238 Hot) | 536 s | 89.3 % (737 s) |
+| high (12) | 509 | 3 / 487 / 0 | 70.6 % / 89.7 % (of 290 Hot) | 220 s | 87.1 % (409 s) |
+* The optimization (steady-state availability, cells not alarms) verifies 25 / 61 / 94 % of the Hot CELLS in low / medium / high; the simulation gives 28 / 49 / 90 % of the Hot ALARMS. The medium value is lower because drones are explicit (each busy for the mission and the 27 min charge), so concurrent alarms and false alarms can leave no ready drone, and DAS localization errors move the target. This difference is a result, not a defect.
+* Cameras verify only 0.5 to 1 % of the intrusions (they cover 1.9 % of the boundary), as in the optimization report.
+* False alarms per day (any scenario): about 45 (animals about 4, authorized vehicles about 28, background noise about 13), cleared by the verifying asset in about 85 % of the cases. They are dominated by the PLACEHOLDER traffic rate (100 authorized vehicles per site per day) and by the stub's error rate; they load the drones, so they matter for the result. Without the "normal traffic near a road or a checkpoint" rule (`d_road_nonthreat_m` 30 m, `d_site_nonthreat_m` 100 m, both ASSUMED) the first run gave about 340 false alarms per day and starved the drones (low: verified within T_resp 18.8 %).

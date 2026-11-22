@@ -37,7 +37,7 @@ end
 % --- paved roads
 rx = zeros(0, 1);   ry = zeros(0, 1);
 for i = 1:numel(T.roads)
-    [gx, gy] = ll2xy(T.roads(i).lat, T.roads(i).lon);   [qx, qy] = densify(gx, gy, 50);   rx = [rx; qx]; ry = [ry; qy]; %#ok<AGROW>
+    [gx, gy] = ll2xy(T.roads(i).lat, T.roads(i).lon);   [qx, qy] = densify(gx, gy, 10);   rx = [rx; qx]; ry = [ry; qy]; %#ok<AGROW>
 end
 TP.d_road = nn_dist(rx, ry, r.x, r.y);
 % --- class (priority wadi > track > urban > steep slope > flat)
