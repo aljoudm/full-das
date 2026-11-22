@@ -1,0 +1,30 @@
+
+	Trial License -- for use to evaluate programs for possible purchase as an end-user only.
+
+build_das_library: loaded C:\Users\aljou\OneDrive\Desktop\full das\results\das_library.mat
+Starting parallel pool (parpool) using the 'Processes' profile ...
+Connected to parallel pool with 4 workers.
+get_allocation: loaded C:\Users\aljou\OneDrive\Desktop\full das\results\alloc_high_22.mat
+get_allocation: loaded C:\Users\aljou\OneDrive\Desktop\full das\results\alloc_low_22.mat
+get_allocation: loaded C:\Users\aljou\OneDrive\Desktop\full das\results\alloc_medium_22.mat
+get_allocation: loaded C:\Users\aljou\OneDrive\Desktop\full das\results\alloc_medium_22.mat
+get_allocation: loaded C:\Users\aljou\OneDrive\Desktop\full das\results\alloc_medium_22.mat
+get_allocation: loaded C:\Users\aljou\OneDrive\Desktop\full das\results\alloc_medium_22.mat
+Monte Carlo done in 997 s
+low                              394 days, 10004 events, 10004 persons
+medium                           394 days, 10004 events, 10004 persons
+high                             394 days, 10004 events, 10004 persons
+medium_BrnoMatrix_SENSITIVITY    394 days, 10004 events, 10004 persons
+medium_pgroup25_SENSITIVITY      394 days, 10004 events, 16089 persons
+medium_pgroup50_SENSITIVITY      394 days, 10004 events, 22547 persons
+               run_case                verified_events    verified_persons    share_verified_events_group    share_single_with_neighbour_below_50m    person_link_accuracy_of_links_made    person_link_rate    decision_rate    group_level_accuracy    wrong_person_links_per_100_persons
+    _______________________________    _______________    ________________    ___________________________    _____________________________________    __________________________________    ________________    _____________    ____________________    __________________________________
+
+    "low"                                   7476                7476                          0                           0.00040128                                0.9992                      0.94992            0.95194             0.94922                        0.072056             
+    "medium"                                9443                9443                          0                           0.00042359                                0.9992                      0.94989             0.9519             0.94919                        0.072093             
+    "high"                                  9540                9540                          0                           0.00031447                                0.9992                      0.94993            0.95194             0.94923                        0.072028             
+    "medium_BrnoMatrix_SENSITIVITY"         7992                7992                          0                           0.00012513                                0.9992                      0.94996            0.95196             0.94926                        0.071995             
+    "medium_pgroup25_SENSITIVITY"           9471               15204                    0.24411                           0.00021117                               0.98049                       0.5025            0.59621             0.59309                         0.97843             
+    "medium_pgroup50_SENSITIVITY"           9435               21165                    0.49889                           0.00021198                               0.95217                      0.29282            0.42966             0.42636                          1.3993             
+
+done

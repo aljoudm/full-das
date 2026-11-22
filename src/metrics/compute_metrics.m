@@ -28,6 +28,12 @@ for k = 1:size(defs, 1)
 end
 ci = bootstat(@(ii) median(E.verif_dt(ii(hasAsset(ii))), 'omitnan'), dayIdx, nD, B, rs);   rows(end+1, :) = {'median_verification_s', median(E.verif_dt(hasAsset), 'omitnan'), ci(1), ci(2), nnz(hasAsset), nnz(hasAsset), 's', 'run_scenario'};
 ci = bootstat(@(ii) median(E.patrol_dt(ii(pat(ii))), 'omitnan'), dayIdx, nD, B, rs);   rows(end+1, :) = {'median_alarm_to_patrol_s', median(E.patrol_dt(pat), 'omitnan'), ci(1), ci(2), nnz(pat), nnz(pat), 's', 'run_scenario'};
+ci = bootstat(@(ii) prctile(E.patrol_dt(ii(pat(ii))), 90), dayIdx, nD, B, rs);   rows(end+1, :) = {'p90_alarm_to_patrol_s', prctile(E.patrol_dt(pat), 90), ci(1), ci(2), nnz(pat), nnz(pat), 's', 'run_scenario'};
+ci = bootstat(@(ii) prctile(E.verif_dt(ii(hasAsset(ii))), 90), dayIdx, nD, B, rs);   rows(end+1, :) = {'p90_verification_s', prctile(E.verif_dt(hasAsset), 90), ci(1), ci(2), nnz(hasAsset), nnz(hasAsset), 's', 'run_scenario'};
+need = E.patrol_needed > 0;   full = need & E.patrol_sent >= E.patrol_needed;   val = nnz(full) / max(nnz(need), 1);   ci = bootstat(@(ii) nnz(full(ii)) / max(nnz(need(ii)), 1), dayIdx, nD, B, rs);
+rows(end+1, :) = {'patrol_fully_staffed_of_confirmed', val, ci(1), ci(2), nnz(full), nnz(need), '-', 'run_scenario'};
+grp = E.group_size > 1;   rows(end+1, :) = {'share_events_group', mean(grp), NaN, NaN, nnz(grp), n, '-', 'run_scenario'};   rows(end+1, :) = {'persons_total', sum(E.group_size), NaN, NaN, sum(E.group_size), n, 'persons', 'run_scenario'};
+vp = ver .* E.group_size;   rows(end+1, :) = {'persons_in_verified_events', sum(vp) / sum(E.group_size), NaN, NaN, sum(vp), sum(E.group_size), '-', 'run_scenario'};
 series = {'fa_cued', FA.fa_cued; 'fa_site', FA.fa_site; 'fa_before_all', FA.fa_cued + FA.fa_site; 'fa_patrol', FA.fa_patrol};
 for k = 1:size(series, 1)
     x = series{k, 2};   bs = zeros(B, 1);

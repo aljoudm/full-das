@@ -1,0 +1,8 @@
+
+	Trial License -- for use to evaluate programs for possible purchase as an end-user only.
+
+build_das_library: loaded C:\Users\aljou\OneDrive\Desktop\full das\results\das_library.mat
+get_allocation: loaded C:\Users\aljou\OneDrive\Desktop\full das\results\alloc_medium_22.mat
+incident: day 1, walking, verification after 55 s, patrol on scene 313 s after the alarm
+GIF written: C:\Users\aljou\OneDrive\Desktop\full das\report\figures\incident_3d.gif (92 frames)
+done

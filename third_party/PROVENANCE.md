@@ -14,3 +14,9 @@
 
 ## Table
 `config/parameters_reviewed.tsv` started as a copy of `optimization/parameters_reviewed.tsv` at f51b223 and is now THE single parameter table of full-das (10th column `value_type`, rows added 22 Nov 2026 are tagged `[full-das 2026-11-22]`).
+
+## 3D rendering style (added 24 Nov 2026)
+| Folder | Source | Commit | Notes |
+| --- | --- | --- | --- |
+| `dasmap_viz/set_camera.m`, `dasmap_viz/draw_terrain.m` | https://github.com/aljoudm/DAS-map- (`set_camera.m`, `draw_terrain.m`) | `a25fd0c049b885904fc58288d21ea3840e9f0427` | Byte-for-byte copies (the oblique perspective camera and the textured terrain surface of the DAS-map digital twin). `src/viz/draw_twin3d.m` follows the same style (satellite texture draped on the Copernicus DEM, vertical exaggeration 2, perspective camera, fibre lifted above a ridge-dilated mesh); `config.m` of DAS-map was read, not copied. |
+| `data/imagery/esri_zoom_hot_nw.jpg` | crop of DAS-map `data/dem/tex_base.jpg` (Esri World Imagery export made by `prepare_terrain.m` on 2026-11-01, not tracked in the DAS-map repo) | a25fd0c (script) | Higher-resolution crop (about 6 m/px) used only by the zoomed 3D view. Attribution: Esri, Vantor, Earthstar Geographics, and the GIS User Community (terms still to be confirmed, see `data/imagery/README.md`). |

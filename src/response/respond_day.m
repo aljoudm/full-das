@@ -19,6 +19,8 @@ v = P.v;   f = P.fd;   n = height(ev);   r = T.cells.ring;
 R = table(strings(n, 1), zeros(n, 1), false(n, 1), false(n, 1), false(n, 1), nan(n, 1), strings(n, 1), nan(n, 1), nan(n, 1), false(n, 1), false(n, 1), nan(n, 1), zeros(n, 1), nan(n, 1), ...
     'VariableNames', {'class_out', 'conf', 'threat', 'site_routed', 'alarm', 't_alarm', 'asset', 't_verif', 'verif_dt', 'in_Tresp', 'confirmed', 'patrol_dt', 'station', 'd_asset_m'});
 R.zone = T.cells.zoneCode(ev.cell);   R.zone(ev.cell == 0) = 0;
+R.patrol_needed = zeros(n, 1);   R.patrol_sent = zeros(n, 1);
+U = rand(s, n, 3);          % one fixed block of random numbers per event: the confirmation draws do not depend on which assets happen to be free (common random numbers across scenarios)
 % --- classification of every DAS detection (stub, one place: ai_interface)
 det = obs.detected;   truth = ev.type;   truth(ev.kind == "normal_vehicle") = "vehicle";
 cl = ai_interface('classify_batch', truth(det), s);   R.class_out(det) = cl.class;   R.conf(det) = cl.confidence;
@@ -56,17 +58,21 @@ for k = ord(:)'
         else, R.asset(k) = R.asset(k) + " (single: no second drone ready)"; end
     end
     R.t_verif(k) = ta + max(tFirst, tSecond);   R.verif_dt(k) = R.t_verif(k) - ta;   R.in_Tresp(k) = R.verif_dt(k) <= v.T_resp_s;
-    if ev.is_intrusion(k), c1 = rand(s) <= Pc;
-    elseif R.site_routed(k), c1 = rand(s) > f.p_site_clear;           % authorized traffic at a guarded site: cleared with p_site_clear (PLACEHOLDER)
-    else, c1 = rand(s) > Pc; end
-    if second && c1 && ev.is_intrusion(k), c1 = rand(s) <= Pc_dr;
-    elseif second && c1, c1 = rand(s) > Pc_dr; end                    % both checks must confirm
+    if ev.is_intrusion(k), c1 = U(k, 1) <= Pc;
+    elseif R.site_routed(k), c1 = U(k, 1) > f.p_site_clear;           % authorized traffic at a guarded site: cleared with p_site_clear (PLACEHOLDER)
+    else, c1 = U(k, 1) > Pc; end
+    if second && c1 && ev.is_intrusion(k), c1 = U(k, 2) <= Pc_dr;
+    elseif second && c1, c1 = U(k, 2) > Pc_dr; end                    % both checks must confirm
     R.confirmed(k) = c1;
     if R.confirmed(k)
-        d = hypot(px - xh, py - yh);   d(pfree > R.t_verif(k)) = inf;   [dm, ip] = min(d);
-        if isfinite(dm)
-            tp = R.t_verif(k) + dm * f.k_road_patrol / f.v_patrol;   R.patrol_dt(k) = tp - ta;   pfree(ip) = tp + f.T_patrol_busy_s;
+        need = 1;   if ismember('group_size', ev.Properties.VariableNames), need = ceil(ev.group_size(k) / f.persons_per_patrol); end   % a group needs one patrol per persons_per_patrol people
+        R.patrol_needed(k) = need;   arr = zeros(1, 0);
+        for q = 1:need
+            d = hypot(px - xh, py - yh);   d(pfree > R.t_verif(k)) = inf;   [dm, ip] = min(d);
+            if ~isfinite(dm), break; end
+            tp = R.t_verif(k) + dm * f.k_road_patrol / f.v_patrol;   arr(end+1) = tp;   pfree(ip) = tp + f.T_patrol_busy_s; %#ok<AGROW>
         end
+        if ~isempty(arr), R.patrol_dt(k) = max(arr) - ta;   R.patrol_sent(k) = numel(arr); end       % the response is complete when the last needed patrol is on scene
     end
 end
 R.asset(R.asset == "") = "none";

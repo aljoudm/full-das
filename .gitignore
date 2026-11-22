@@ -14,3 +14,4 @@ das_brno/
 *.h5
 *.zip
 results/stage8/*.mat
+results/stage9/*.mat
