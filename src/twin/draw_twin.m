@@ -14,12 +14,12 @@ for i = 1:numel(T.roads)
     cl = char(T.roads(i).class);   cl = erase(cl, '_link');   if ~isKey(rc, cl), continue; end
     plot(ax, T.roads(i).lon, T.roads(i).lat, '-', 'Color', [rc(cl) 0.8], 'LineWidth', 0.5);
 end
-zc = [0.20 0.45 0.85; 0.95 0.65 0.10; 0.85 0.15 0.15];                         % Cold, Neutral, Hot
+zn = {'Cold zone', 'Neutral zone', 'Hot zone'};   zc = [0.20 0.45 0.85; 0.95 0.65 0.10; 0.85 0.15 0.15];                         % Cold, Neutral, Hot
 pc = T.cells.ring.cell(:);   z = T.cells.zoneCode(pc);
 for k = 1:3
     m = z == k;   xx = T.ring_ll(:, 2);   yy = T.ring_ll(:, 1);   xx(~m) = NaN;   yy(~m) = NaN;
-    h(k) = plot(ax, xx, yy, '.', 'Color', zc(k, :), 'MarkerSize', 5); %#ok<AGROW>
+    h(k) = plot(ax, xx, yy, '.', 'Color', zc(k, :), 'MarkerSize', 5, 'DisplayName', zn{k}); %#ok<AGROW>
 end
-legend(ax, h, {'Cold', 'Neutral', 'Hot'}, 'Location', 'northwest');
+legend(ax, h, 'Location', 'northwest');
 xlim(ax, [min(D.lon) max(D.lon)]);   ylim(ax, [min(D.lat) max(D.lat)]);   set(ax, 'DataAspectRatio', [1 cosd(mean(D.lat)) 1]);   xlabel(ax, 'longitude [deg]');   ylabel(ax, 'latitude [deg]');
 end
