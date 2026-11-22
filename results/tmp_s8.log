@@ -1,0 +1,32 @@
+
+	Trial License -- for use to evaluate programs for possible purchase as an end-user only.
+
+build_das_library: loaded C:\Users\aljou\OneDrive\Desktop\full das\results\das_library.mat
+Starting parallel pool (parpool) using the 'Processes' profile ...
+Connected to parallel pool with 4 workers.
+get_allocation: loaded C:\Users\aljou\OneDrive\Desktop\full das\results\alloc_medium_22.mat
+get_allocation: loaded C:\Users\aljou\OneDrive\Desktop\full das\results\alloc_low_22.mat
+get_allocation: loaded C:\Users\aljou\OneDrive\Desktop\full das\results\alloc_high_22.mat
+get_allocation: loaded C:\Users\aljou\OneDrive\Desktop\full das\results\alloc_medium_22.mat
+simulated 60 days x 4 cases in 172 s
+      case      verified_intruders    share_neighbour_below_50m    share_neighbour_below_20m    share_neighbour_below_10m    share_no_simultaneous_neighbour    implied_person_link_accuracy    implied_person_link_rate                                                   label                                               
+    ________    __________________    _________________________    _________________________    _________________________    _______________________________    ____________________________    ________________________    ___________________________________________________________________________________________________
+
+    "low"              1175                           0                        0                            0                             0.7234                           0.9992                       0.94994             "SIMULATED (lookup in reid_grid.csv, pairs 0 %, clock 0.2 s, drone base 2.5 m or fixed camera 1 m)"
+    "medium"           1523                   0.0013132                        0                            0                            0.69796                           0.9992                        0.9499             "SIMULATED (lookup in reid_grid.csv, pairs 0 %, clock 0.2 s, drone base 2.5 m or fixed camera 1 m)"
+    "high"             1473                           0                        0                            0                            0.69857                           0.9992                       0.94999             "SIMULATED (lookup in reid_grid.csv, pairs 0 %, clock 0.2 s, drone base 2.5 m or fixed camera 1 m)"
+
+            metric             value         lo          hi         n_num       n_den
+    ______________________    ________    ________    ________    __________    _____
+
+    {'Pd'                }     0.96273     0.95445     0.97111          1550    1610 
+    {'Pc_cond'           }     0.97871      0.9726     0.98444          1517    1550 
+    {'Pd_x_Pc'           }     0.94224     0.93255     0.95106          1517    1610 
+    {'verified_Tresp'    }     0.36584     0.34313     0.39017           589    1610 
+    {'verified_Tresp_hot'}     0.48857     0.45907     0.51897           470     962 
+    {'patrol_reached'    }     0.84099     0.82483     0.85723          1354    1610 
+    {'height_measurable' }    0.037888    0.029403    0.046961            61    1610 
+    {'fa_before_all'     }      17.936      17.847      18.022    1.5654e+05      60 
+    {'fa_patrol'         }     0.21804     0.20825      0.2279          1903      60 
+
+done

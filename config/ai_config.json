@@ -6,7 +6,7 @@
     "Pc": 0.983,
     "Pc_source": "Pc_DAS of the parameter table, low end of 0.983 to 0.993 (wang2024); 0.993 is the high-end sensitivity",
     "confusion_file": "",
-    "confusion_counts_file": "results/classifier/confusion_matrix.csv",
+    "confusion_counts_file": "results/classifier/T1s/confusion_matrix.csv",
     "dirichlet_prior": 0.5,
     "sensitivity_note": "The Brno confusion matrix (results/classifier/T1s/confusion_matrix.csv) is a SENSITIVITY only, labelled 'Brno, 4 test recordings, SENSITIVITY'; the base stays mode 'uniform' (Pc from the literature). In mode 'confusion_counts' every class missing from the matrix (running, digging, tampering, background, animal) falls back to the uniform stub."
   },

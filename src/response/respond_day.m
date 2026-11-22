@@ -22,7 +22,7 @@ R.zone = T.cells.zoneCode(ev.cell);   R.zone(ev.cell == 0) = 0;
 % --- classification of every DAS detection (stub, one place: ai_interface)
 det = obs.detected;   truth = ev.type;   truth(ev.kind == "normal_vehicle") = "vehicle";
 cl = ai_interface('classify_batch', truth(det), s);   R.class_out(det) = cl.class;   R.conf(det) = cl.confidence;
-threatSet = ["walking" "running" "vehicle" "digging" "climbing"];
+threatSet = ["walking" "running" "vehicle" "digging" "climbing" "tampering"];
 cam0 = A.sites([A.sites.in]);   dsite = min(hypot(r.x(ev.piece) - [cam0.x], r.y(ev.piece) - [cam0.y]), [], 2);
 roadVeh = R.class_out == "vehicle" & (TP.d_road(ev.piece) < f.d_road_nonthreat_m | dsite < f.d_site_nonthreat_m);   % normal traffic: logged, no alarm
 R.threat = det & ismember(R.class_out, threatSet);   R.site_routed = R.threat & roadVeh;      % low priority: goes to the site guard and its cameras, not cancelled

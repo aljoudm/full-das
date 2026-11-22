@@ -1,0 +1,4 @@
+case,verified_intruders,share_neighbour_below_50m,share_neighbour_below_20m,share_neighbour_below_10m,share_no_simultaneous_neighbour,implied_person_link_accuracy,implied_person_link_rate,label
+low,1175,0,0,0,0.723404255319149,0.999202382978721,0.949941191489365,"SIMULATED (lookup in reid_grid.csv, pairs 0 %, clock 0.2 s, drone base 2.5 m or fixed camera 1 m)"
+medium,1523,0.00131319763624425,0,0,0.697964543663821,0.999201575837156,0.949896651346026,"SIMULATED (lookup in reid_grid.csv, pairs 0 %, clock 0.2 s, drone base 2.5 m or fixed camera 1 m)"
+high,1473,0,0,0,0.69857433808554,0.999203258655798,0.949993075356414,"SIMULATED (lookup in reid_grid.csv, pairs 0 %, clock 0.2 s, drone base 2.5 m or fixed camera 1 m)"

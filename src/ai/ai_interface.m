@@ -21,6 +21,7 @@ end
 function cfg = read_cfg()
 root = fileparts(fileparts(fileparts(mfilename('fullpath'))));
 cfg = jsondecode(fileread(fullfile(root, 'config', 'ai_config.json')));   cfg.root = root;
+m = getenv('AI_CLASSIFIER_MODE');   if ~isempty(m), cfg.classifier.mode = m; end      % run-time override (sensitivity runs); the file keeps the base mode uniform
 end
 
 function r = classify_one(win, cfg)
