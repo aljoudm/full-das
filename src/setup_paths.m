@@ -8,5 +8,6 @@ addpath(genpath(fullfile(here, 'twin')), genpath(fullfile(here, 'alloc')), genpa
         genpath(fullfile(here, 'tracking')), genpath(fullfile(here, 'metrics')), genpath(fullfile(here, 'viz')), genpath(fullfile(here, 'profile')));
 addpath(fullfile(root, 'config'));
 addpath(fullfile(root, 'third_party', 'optimization', 'src'));     % run_optimization, load_cells, ... (frozen copy)
+  addpath(genpath(fullfile(here, 'siting')));
 addpath(fullfile(root, 'third_party', 'das_engine'));              % phi-OTDR engine (frozen copy)
 end

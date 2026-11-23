@@ -20,3 +20,8 @@
 | --- | --- | --- | --- |
 | `dasmap_viz/set_camera.m`, `dasmap_viz/draw_terrain.m` | https://github.com/aljoudm/DAS-map- (`set_camera.m`, `draw_terrain.m`) | `a25fd0c049b885904fc58288d21ea3840e9f0427` | Byte-for-byte copies (the oblique perspective camera and the textured terrain surface of the DAS-map digital twin). `src/viz/draw_twin3d.m` follows the same style (satellite texture draped on the Copernicus DEM, vertical exaggeration 2, perspective camera, fibre lifted above a ridge-dilated mesh); `config.m` of DAS-map was read, not copied. |
 | `data/imagery/esri_zoom_hot_nw.jpg` | crop of DAS-map `data/dem/tex_base.jpg` (Esri World Imagery export made by `prepare_terrain.m` on 2026-11-01, not tracked in the DAS-map repo) | a25fd0c (script) | Higher-resolution crop (about 6 m/px) used only by the zoomed 3D view. Attribution: Esri, Vantor, Earthstar Geographics, and the GIS User Community (terms still to be confirmed, see `data/imagery/README.md`). |
+
+## Interrogator siting (added 23 Nov 2026)
+| Folder | Source | Commit | Notes |
+| --- | --- | --- | --- |
+| `optimization_siting/` | https://github.com/aljoudm/optimization, branch `interrogator-siting` (main untouched) | `d39f6b7558eaa388b0394d35b2d35fdcc842d3c9` | Byte-for-byte copy of `src/` and `inputs/` of the branch: MILP with candidate shelter sites (lead-in fibre, reach d* - lead-in), analytic N_min, lexicographic stages 2b/2c. Without the `Siting` option it gives the results of f51b223 (tests/test_siting_equivalence.m: low, medium). Pushed 23 Nov 2026. |

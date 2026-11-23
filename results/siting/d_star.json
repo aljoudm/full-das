@@ -1,0 +1,18 @@
+{
+  "Pd_target": 0.969,
+  "d_star_km": 17,
+  "d_star_km_if_lower_95_limit_used": 10,
+  "d_star_km_if_upper_95_limit_used": 18,
+  "febus_range_option_km": 20,
+  "N_min": 5,
+  "L_boundary_km": 145.4735,
+  "rule": "largest d with the monotone (PAV) fit of Pd(d) >= Pd_target",
+  "windows_per_type_per_distance": 80,
+  "type_share": {
+    "walking": 0.49580167932826874,
+    "running": 0.1906237504998001,
+    "vehicle": 0.15633746501399443,
+    "digging": 0.0543782487005198,
+    "climbing": 0.10285885645741705
+  }
+}
