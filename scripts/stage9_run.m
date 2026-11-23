@@ -3,10 +3,11 @@
 % Cases: low / medium / high with the BASE uniform classifier stub (Pc 0.983, ASSUMED) and single intruders; medium with the Brno confusion matrix (SENSITIVITY only);
 % medium with group intrusions p_group = 25 % and 50 % (ASSUMED sensitivities).
 addpath(fullfile(fileparts(mfilename('fullpath')), '..', 'src'));   root = setup_paths();
-minN = 10000;   seed = 9090;
-P = load_params_fd();   T = load_twin(P);   TP = terrain_pieces(T, P);   lib = build_das_library(P);
+minN = 10000;   seed = 9090;   outn = getenv('STAGE9_OUT');   if isempty(outn), outn = 'stage9'; end,   if ~isfolder(fullfile(root, 'results', outn)), mkdir(fullfile(root, 'results', outn)); end
+P = load_params_fd();   if strcmp(outn, 'stage9_siting'), P.sim = struct('siting', true, 'pdmodel', true); end,   T = load_twin(P);   TP = terrain_pieces(T, P);   lib = build_das_library(P);   % siting allocations (6 shelters, lead-in) + the unified Pd(d) model; same seed (common random numbers) as the base run
 cases = {'low', 'uniform', 0; 'medium', 'uniform', 0; 'high', 'uniform', 0; 'medium', 'confusion_counts', 0; 'medium', 'uniform', 0.25; 'medium', 'uniform', 0.5};
 names = {'low', 'medium', 'high', 'medium_BrnoMatrix_SENSITIVITY', 'medium_pgroup25_SENSITIVITY', 'medium_pgroup50_SENSITIVITY'};
+if isempty(gcp('nocreate')), cl = parcluster('Processes');   cl.NumWorkers = 6;   parpool(cl, 6); end
 Es = cell(6, 1);   FAs = cell(6, 1);   t0 = tic;
 parfor k = 1:6
     [Es{k}, FAs{k}] = run_scenario(P, T, TP, lib, cases{k, 1}, minN, seed, cases{k, 2}, cases{k, 3});
@@ -14,12 +15,12 @@ end
 fprintf('Monte Carlo done in %.0f s\n', toc(t0));
 rows = table();
 for k = 1:6
-    E = Es{k};   FA = FAs{k};   save(fullfile(root, 'results', 'stage9', ['run_' names{k} '.mat']), 'E', 'FA');
+    E = Es{k};   FA = FAs{k};   save(fullfile(root, 'results', outn, ['run_' names{k} '.mat']), 'E', 'FA');
     M = compute_metrics(E, FA, T, P);   r = M.rows;   r.run_case = repmat(string(names{k}), height(r), 1);   r.label = repmat("SIMULATED", height(r), 1);
     r.classifier = repmat(string(cases{k, 2}), height(r), 1);   r.p_group = repmat(cases{k, 3}, height(r), 1);   r.intruder_events = repmat(M.intruders, height(r), 1);   r.days = repmat(FA.nDays, height(r), 1);   rows = [rows; r]; %#ok<AGROW>
     fprintf('%-32s %d days, %d events, %d persons\n', names{k}, FA.nDays, height(E), sum(E.group_size));
 end
-writetable(rows, fullfile(root, 'results', 'stage9', 'metrics_summary.csv'));
+writetable(rows, fullfile(root, 'results', outn, 'metrics_summary.csv'));
 % ---- re-identification inside the simulation (SIMULATED lookups): singles by the spacing to the nearest simultaneous intruder, groups by their size
 G = readtable(fullfile(root, 'results', 'reid', 'reid_grid.csv'));   GG = readtable(fullfile(root, 'results', 'reid', 'group_events.csv'));
 r = T.cells.ring;   arc = r.s(:);   grid = [50 20 10 5 2 1];   RE = table();
@@ -49,4 +50,4 @@ for k = 1:6
         'VariableNames', {'run_case', 'verified_events', 'verified_persons', 'share_verified_events_group', 'share_single_with_neighbour_below_50m', 'person_link_accuracy_of_links_made', 'person_link_rate', 'decision_rate', 'group_level_accuracy', 'wrong_person_links_per_100_persons'})]; %#ok<AGROW>
 end
 RE.label = repmat("SIMULATED lookup (reid_grid.csv for singles, group_events.csv for groups; drone base 2.5 m, fixed camera 1 m when a camera verified)", height(RE), 1);
-writetable(RE, fullfile(root, 'results', 'stage9', 'reid_in_simulation.csv'));   disp(RE(:, 1:end-1));
+writetable(RE, fullfile(root, 'results', outn, 'reid_in_simulation.csv'));   disp(RE(:, 1:end-1));

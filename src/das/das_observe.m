@@ -24,7 +24,7 @@ for k = 1:n
     if ~hasDAS(k), continue; end
     sg = das_lookup(lib, char(ev.type(k)), min(dist(k), max(lib.dist_m)), s);
     S(k) = sg.S;   det(k) = sg.detected;
-    if usePd, ti = find(strcmp(PM.types, char(ev.type(k))), 1);   if ~isempty(ti), det(k) = U(k) < interp1(PM.dist_km, PM.pd(:, ti), min(dist(k) / 1e3, PM.dist_km(end)), 'linear'); end, end   ze(k) = sg.z_err;   snr(k) = sg.snr_db;   li(k) = sg.lib_index;
+    if usePd, ti = find(strcmp(PM.types, char(ev.type(k))), 1);   if ~isempty(ti), det(k) = U(k) < interp1(PM.dist_km, PM.pd(:, ti), min(dist(k) / 1e3, PM.dist_km(end)), 'linear'); end, end,   ze(k) = sg.z_err;   snr(k) = sg.snr_db;   li(k) = sg.lib_index;
     % estimated position: shift the true piece along the boundary by the localization error (arc distance, sign random)
     q = find(r.s >= sp(k) + sign(randn(s)) * ze(k), 1);   if isempty(q), q = ev.piece(k); end
     xh(k) = r.x(q);   yh(k) = r.y(q);

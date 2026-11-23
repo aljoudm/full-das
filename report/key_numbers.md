@@ -138,3 +138,19 @@ Rule (table row `siting_dstar_rule`, applied to the **type-mix Pd**, i.e. the av
 * The lexicographic MILP minimises the number of violating cells first, so it takes N = 6: full coverage, C_total 12,654,986 SAR, i.e. **+879,228 SAR (+7.5 %) for the 4.10 km that the 5-site solution leaves uncovered**.
 * Sensitivities (road 100 / 200 / 500 m, slope 5 / 10 / 15 %, waterway 25 / 50 / 100 m, inside distance 200 / 500 m): N = 6 in all 8 cases; cost 12,654,814-12,655,748 SAR; five of the six sites are the same in every case (4 checkpoints Al-Sharaye, Al-Hada, Al-Shumaisi (new), Al-Nawariyah and one road site near 58.4 km); only the road site near 108.9 km moves (97.4 km with slope 5 %, 97.9 km with road 500 m).
 * The site at 86 km (Al-Shumaisi (new) checkpoint) has a ground slope of 15.3 %: it is allowed because the entrance checkpoints are exempt from the filters (table row `siting_checkpoint_exempt`; they already have buildings and infrastructure).
+
+## Siting: three scenarios, robustness to the d* rule, cost comparison (`results/alloc_*_22_siting*.mat`, `results/siting/siting_*`)
+* **Low, medium and high give the same result** at d* = 14.75 km: N = 6, C_total 12,654,986 SAR, the same six sites (boundary arcs 8.70, 29.58, 58.44, 85.95, 108.90, 125.19 km; four checkpoints Al-Sharaye, Al-Hada, Al-Shumaisi (new), Al-Nawariyah and two road sites), no unserved run, maximum optical distance 14.23 km. The scenarios differ only in the drones, which do not enter the siting.
+* **Robustness to the d* rule: N = 6 under the Pd rule of the type mix (d* = 14.75 km), N = 7 under the weakest-type rule (d* = 13 km, walking): C_total 13,303,473 SAR (+648,487 SAR), sites at 1.80, 22.44, 46.24, 64.90, 85.95, 108.90, 125.19 km, maximum optical distance 11.47 km.** The analytic N_min is 6 for d* = 13 km (ceil(145.47 / 26)).
+* **Cost: main model (4 interrogators) versus siting model (6 interrogators)**
+
+| Item | Main model (4 interrogators) | Siting model (6) | Difference |
+| --- | ---: | ---: | ---: |
+| Interrogators (636,000 each) | 2,544,000 | 3,816,000 | +1,272,000 |
+| Shelters (C_shelter = 0 in the table) | 0 | 0 | 0 |
+| Sensing fibre (145.46 km) | 8,829,500 | 8,829,500 | 0 |
+| Lead-in fibre (route factor 1.4) | not modelled | 9,480 | +9,480 |
+| **C_total** | **11,373,506** | **12,654,986** | **+1,281,480 (+11.3 %)** |
+| Power: interrogators + shelter cooling | 680 + 680 = 1,360 W | 1,020 + 1,020 = 2,040 W | +680 W |
+
+The model has no operating cost in SAR, only the power draw (within the P0 budget in both). Drones (12 in the medium scenario) are the same in both models and are not part of C_total.
