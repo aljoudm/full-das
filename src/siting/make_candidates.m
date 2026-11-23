@@ -3,7 +3,7 @@ function C = make_candidates(T, P, A, varargin)
 %
 %   C = make_candidates(T, P, A)                         T twin (load_twin), P load_params_fd, A existing assets (checkpoints)
 %   C = make_candidates(T, P, A, 'Slope', 0.10, 'RoadM', 200, 'WaterM', 50)      sensitivity runs
-%   Rules (all thresholds are table rows, ASSUMED): within siting_road_m (200 m) of a road for access and maintenance (OSM paved roads motorway..tertiary and unclassified roads);
+%   Rules (all thresholds are table rows, ASSUMED): INSIDE the protected area, siting_inside_min_m (50 m) to siting_inside_max_m (200 m) from the boundary line (checkpoints, on the line, are the only exception); within siting_road_m (200 m) of a road for access and maintenance (OSM paved roads motorway..tertiary and unclassified roads);
 %   ground slope below siting_slope_pct (10 % = 5.7 deg) on the 30 m DEM (not on a mountain); not within siting_water_m (50 m) of an OSM waterway (not in a wadi channel);
 %   within siting_search_km (3 km) of the boundary so that the lead-in fibre stays short; the 5 entrance checkpoints are ALWAYS candidates (guarded, powered and air-conditioned
 %   already), whatever the filters say, and are marked kind = 'checkpoint' (preferred in the third objective of the MILP).
@@ -11,7 +11,7 @@ function C = make_candidates(T, P, A, varargin)
 %   Output struct array C: lat, lon, x, y (local m), kind ('road'|'checkpoint'), arc_m (arc position of the nearest boundary point), leadin_m (route length of the lead-in fibre
 %   from the shelter to the boundary = siting_leadin_factor x straight distance), road_m, slope_pct, water_m, run (index of the boundary run that contains arc_m), name.
 ip = inputParser;   addParameter(ip, 'Slope', P.fd.siting_slope_pct / 100);   addParameter(ip, 'RoadM', P.fd.siting_road_m);   addParameter(ip, 'WaterM', P.fd.siting_water_m);
-addParameter(ip, 'SearchKm', P.fd.siting_search_km);   addParameter(ip, 'Step', 100);   parse(ip, varargin{:});   o = ip.Results;
+addParameter(ip, 'SearchKm', P.fd.siting_inside_max_m / 1e3);   addParameter(ip, 'InsideMin', P.fd.siting_inside_min_m);   addParameter(ip, 'InsideMax', P.fd.siting_inside_max_m);   addParameter(ip, 'Step', 50);   parse(ip, varargin{:});   o = ip.Results;
 root = fileparts(fileparts(fileparts(mfilename('fullpath'))));   r = T.cells.ring;   D = T.dem;
 ll2xy = @(lat, lon) deal((lon(:) - r.lon0) * r.kx, (lat(:) - r.lat0) * r.ky);
 % ---- road points (paved + unclassified), densified to 25 m: used to measure the distance of a candidate to a road
@@ -27,7 +27,7 @@ for i = 1:numel(J.elements)
 end
 % ---- candidate grid (o.Step m) over the corridor around the boundary, kept if within SearchKm of the boundary and within RoadM of a road
 [GX, GY] = meshgrid(min(r.x) - o.SearchKm * 1e3 : o.Step : max(r.x) + o.SearchKm * 1e3, min(r.y) - o.SearchKm * 1e3 : o.Step : max(r.y) + o.SearchKm * 1e3);   px = GX(:);   py = GY(:);
-[kb, dB] = knnsearch([r.x(:) r.y(:)], [px py]);   keep = dB <= o.SearchKm * 1e3;   px = px(keep);   py = py(keep);   kb = kb(keep);   dB = dB(keep);
+[kb, dB] = knnsearch([r.x(:) r.y(:)], [px py]);   in = inpolygon(px, py, r.x(:), r.y(:));   keep = dB <= o.InsideMax & dB >= o.InsideMin & in;   px = px(keep);   py = py(keep);   kb = kb(keep);   dB = dB(keep);   % INSIDE the boundary (protected side), InsideMin..InsideMax m from the line
 [~, dRoad] = knnsearch([rx ry], [px py]);   keep = dRoad <= o.RoadM;   px = px(keep);   py = py(keep);   kb = kb(keep);   dB = dB(keep);   dRoad = dRoad(keep);
 % ---- slope on the DEM
 lat = r.lat0 + py / r.ky;   lon = r.lon0 + px / r.kx;

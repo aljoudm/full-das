@@ -1,13 +1,20 @@
 {
   "Pd_target": 0.969,
-  "d_star_km": 17,
-  "d_star_km_if_lower_95_limit_used": 10,
-  "d_star_km_if_upper_95_limit_used": 18,
+  "rule": "d* = farthest distance with the LOWER 95 % limit of the monotone Pd(d) >= Pd_DAS (fixed before the dense run)",
+  "d_star_km": 14.75,
+  "d_star_km_weakest_type_lower_limit_INFO": 13,
+  "d_star_km_point_estimate_rule": 15,
+  "d_star_km_upper_limit_rule": 17,
   "febus_range_option_km": 20,
   "N_min": 5,
   "L_boundary_km": 145.4735,
-  "rule": "largest d with the monotone (PAV) fit of Pd(d) >= Pd_target",
-  "windows_per_type_per_distance": 80,
+  "N_equals_5_for_d_star_between_km": [
+    14.54735,
+    18.1841875
+  ],
+  "dense_windows_per_type_per_distance": "1000 at 12, 12.5, 13 km; 400 at 14-20 km",
+  "dense_grid_km": "12, 12.5, 13, 14..20",
+  "coarse_windows_per_type": 80,
   "type_share": {
     "walking": 0.49580167932826874,
     "running": 0.1906237504998001,

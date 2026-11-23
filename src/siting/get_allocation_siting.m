@@ -8,12 +8,12 @@ function [alloc, C, S] = get_allocation_siting(P, scenario, varargin)
 %   Candidates: make_candidates (roads, slope, waterways, checkpoints); C is the candidate struct array. N_min = ceil(L_boundary / (2 d*)); the MILP asserts N >= N_min.
 %   Objectives (lexicographic): violations, shortfall, C_total (interrogator + shelter + sensing fibre + LEAD-IN fibre), then the sum over runs of (expected intruders x optical distance),
 %   then as many interrogators as possible at the checkpoints, then A_ver of the Hot cells. Saved in results/alloc_<scenario>_22_siting[_<tag>].mat (the solver licence is a trial).
-ip = inputParser;   addParameter(ip, 'DStarKm', []);   addParameter(ip, 'Tag', '');   addParameter(ip, 'Force', false);   addParameter(ip, 'Slope', []);   addParameter(ip, 'RoadM', []);   addParameter(ip, 'WaterM', []);
+ip = inputParser;   addParameter(ip, 'DStarKm', []);   addParameter(ip, 'Tag', '');   addParameter(ip, 'Force', false);   addParameter(ip, 'Slope', []);   addParameter(ip, 'RoadM', []);   addParameter(ip, 'WaterM', []);   addParameter(ip, 'InsideMax', []);
 parse(ip, varargin{:});   o = ip.Results;
 root = fileparts(fileparts(fileparts(mfilename('fullpath')))); tag = o.Tag;   if ~isempty(tag), tag = ['_' tag]; end
 f = fullfile(root, 'results', sprintf('alloc_%s_22_siting%s.mat', scenario, tag));
 T = load_twin(P);   [~, ~, A] = get_allocation(P, scenario);
-cargs = {};   if ~isempty(o.Slope), cargs = [cargs {'Slope', o.Slope}]; end,   if ~isempty(o.RoadM), cargs = [cargs {'RoadM', o.RoadM}]; end,   if ~isempty(o.WaterM), cargs = [cargs {'WaterM', o.WaterM}]; end
+cargs = {};   if ~isempty(o.Slope), cargs = [cargs {'Slope', o.Slope}]; end,   if ~isempty(o.RoadM), cargs = [cargs {'RoadM', o.RoadM}]; end,   if ~isempty(o.WaterM), cargs = [cargs {'WaterM', o.WaterM}]; end,   if ~isempty(o.InsideMax), cargs = [cargs {'InsideMax', o.InsideMax}]; end
 C = make_candidates(T, P, A, cargs{:});
 if isempty(o.DStarKm), J = jsondecode(fileread(fullfile(root, 'results', 'siting', 'd_star.json')));   dstar = J.d_star_km; else, dstar = o.DStarKm; end
 Nmin = ceil(P.v.L_boundary_m / 1e3 / (2 * dstar));

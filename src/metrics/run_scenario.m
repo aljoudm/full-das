@@ -8,11 +8,14 @@ function [E, FA] = run_scenario(P, T, TP, lib, scenario, minIntruders, seed, mod
 %   scenarios come from the assets only. (Streams: one for events and DAS, one for the response; the response draws a fixed block of numbers per event.)
 %   E         table, one row per REAL intruder event; FA struct, one row per day (false alarms before / after verification).
 setenv('AI_CLASSIFIER_MODE', mode);   cleanup = onCleanup(@() setenv('AI_CLASSIFIER_MODE', ''));
-[al, ~, A] = get_allocation(P, scenario);   G = gen_setup(T, TP, P, A);
+[al, ~, A] = get_allocation(P, scenario);   opts = struct('pdmodel', false);
+if isfield(P, 'sim') && isfield(P.sim, 'siting') && P.sim.siting, X = load(fullfile(fileparts(fileparts(fileparts(mfilename('fullpath')))), 'results', sprintf('alloc_%s_22_siting.mat', scenario)));   al = X.alloc;   end     % siting allocation (sites with lead-in)
+if isfield(P, 'sim') && isfield(P.sim, 'pdmodel'), opts.pdmodel = P.sim.pdmodel; end
+G = gen_setup(T, TP, P, A);
 Es = {};   fa = zeros(0, 5);   n = 0;   d = 0;
 while n < minIntruders || d < 20
     d = d + 1;   sG = RandStream('Threefry', 'Seed', seed * 100000 + d);   sR = RandStream('Threefry', 'Seed', seed * 100000 + d + 50000);
-    ev = gen_day(T, TP, G, P, sG, d, struct('p_group', pGroup));   ob = das_observe(ev, T, al, lib, sG);   R = respond_day(ev, ob, T, TP, al, A, P, sR);   el = height_eligibility(ev, ob, P);
+    ev = gen_day(T, TP, G, P, sG, d, struct('p_group', pGroup));   ob = das_observe(ev, T, al, lib, sG, opts);   R = respond_day(ev, ob, T, TP, al, A, P, sR);   el = height_eligibility(ev, ob, P);
     i = ev.is_intrusion;   f = R.alarm & ~i;
     fa(d, :) = [nnz(f & ~R.site_routed), nnz(f & R.site_routed), nnz(f & R.confirmed & ~isnan(R.patrol_dt)), nnz(R.alarm), nnz(~i)];
     Es{d, 1} = table(repmat(d, nnz(i), 1), ev.type(i), R.zone(i), ev.piece(i), ev.t_start(i), ob.detected(i), R.class_out(i), R.threat(i), R.site_routed(i), R.asset(i), R.t_alarm(i), R.t_verif(i), R.verif_dt(i), R.in_Tresp(i), R.confirmed(i), R.patrol_dt(i), el.ok(i), ev.along(i), ev.group_size(i), R.patrol_needed(i), R.patrol_sent(i), ob.dist_m(i), ...
