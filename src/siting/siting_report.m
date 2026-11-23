@@ -42,6 +42,6 @@ for s = 1:ns, plot(ax, [ia.lon(s) ia.site_lon(s)], [ia.lat(s) ia.site_lat(s)], '
 hS = plot(ax, ia.site_lon, ia.site_lat, 's', 'MarkerFaceColor', [1 1 0.2], 'MarkerEdgeColor', 'k', 'LineWidth', 1.5, 'MarkerSize', 11, 'DisplayName', sprintf('chosen shelters (%d)', ns));
 for s = 1:ns, text(ax, ia.site_lon(s) + 0.004, ia.site_lat(s) + 0.004, sprintf('S%d (%s)', s, cand(s).kind), 'FontSize', 8, 'FontWeight', 'bold', 'BackgroundColor', [1 1 1 0.8], 'Margin', 1); end
 hh = [hC, hO, hS];   for s = 1:ns, hh(end+1) = plot(ax, NaN, NaN, '-', 'Color', cl(s, :), 'LineWidth', 4, 'DisplayName', sprintf('S%d serves %.1f km (max optical distance %.1f km)', s, R.table.covered_length_km(s), R.table.farthest_optical_km(s))); end %#ok<AGROW>
-legend(ax, hh, 'Location', 'northwest', 'Color', 'w', 'FontSize', 8);   title(ax, sprintf('Interrogator siting, %s scenario: d* = %.0f km, N_{min} = %d, N = %d (SIMULATED Pd(d); thresholds ASSUMED)', scenario, dstar / 1e3, alloc.siting.Nmin, ns), 'FontSize', 10);
+legend(ax, hh, 'Location', 'northwest', 'Color', 'w', 'FontSize', 8);   title(ax, sprintf('Interrogator siting, %s scenario: d* = %.2f km, N_{min} = %d, N = %d (SIMULATED Pd(d); thresholds ASSUMED)', scenario, dstar / 1e3, alloc.siting.Nmin, ns), 'FontSize', 10);
 exportgraphics(fig, fullfile(outDir, sprintf('siting_map_%s.png', scenario)), 'Resolution', 140);   close(fig);
 end
