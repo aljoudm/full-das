@@ -1,8 +1,10 @@
 """Build report/stage9_results.md from results/stage9/*.csv (nothing typed by hand). python -I scripts/make_stage9_report.py"""
-import csv, os
+import csv, os, sys
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-rows = list(csv.DictReader(open(os.path.join(ROOT, "results", "stage9", "metrics_summary.csv"))))
-re_ = {r["run_case"]: r for r in csv.DictReader(open(os.path.join(ROOT, "results", "stage9", "reid_in_simulation.csv")))}
+RUN = sys.argv[1] if len(sys.argv) > 1 else "stage9"      # results folder: stage9 (main model) or stage9_siting (siting model)
+OUT = "stage9_results.md" if RUN == "stage9" else "stage9_siting_results.md"
+rows = list(csv.DictReader(open(os.path.join(ROOT, "results", RUN, "metrics_summary.csv"))))
+re_ = {r["run_case"]: r for r in csv.DictReader(open(os.path.join(ROOT, "results", RUN, "reid_in_simulation.csv")))}
 get = lambda c, m: [r for r in rows if r["run_case"] == c and r["metric"] == m][0]
 def pc(c, m, d=1):
     r = get(c, m); return f"{100*float(r['value']):.{d}f} % [{100*float(r['lo']):.{d}f}, {100*float(r['hi']):.{d}f}]"
@@ -35,4 +37,4 @@ A("\n**Re-identification in the simulation (SIMULATED lookups):** singles use th
 A("| Case | Verified persons | Share of verified events that are groups | Accuracy of the person-level links made | Person-level link rate | Decision rate (person or group) | Group-level accuracy | Wrong person-level links per 100 persons |\n| --- | --- | --- | --- | --- | --- | --- | --- |")
 for c, n in [("medium", "base (singles)"), ("medium_pgroup25_SENSITIVITY", "p_group 25 %"), ("medium_pgroup50_SENSITIVITY", "p_group 50 %")]:
     r = re_[c]; A(f"| {n} | {int(float(r['verified_persons']))} | {100*float(r['share_verified_events_group']):.1f} % | {100*float(r['person_link_accuracy_of_links_made']):.1f} % | {100*float(r['person_link_rate']):.1f} % | {100*float(r['decision_rate']):.1f} % | {100*float(r['group_level_accuracy']):.1f} % | {float(r['wrong_person_links_per_100_persons']):.2f} |")
-open(os.path.join(ROOT, "report", "stage9_results.md"), "w", encoding="utf8").write("\n".join(L) + "\n"); print("\n".join(L))
+open(os.path.join(ROOT, "report", OUT), "w", encoding="utf8").write("\n".join(L) + "\n"); print("\n".join(L))

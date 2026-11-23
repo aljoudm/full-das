@@ -2,7 +2,8 @@
 % PNG, 300 dpi, A4 text width 16 cm, fixed cameras (src/viz/twin3d_camera.m), saved in report/figures/.  Uses results/stage9/run_medium.mat when it exists, else stage8.
 addpath(fullfile(fileparts(mfilename('fullpath')), '..', 'src'));   root = setup_paths();   addpath(fullfile(root, 'third_party', 'dasmap_viz'));
 P = load_params_fd();   T = load_twin(P);   [al, ~, A] = get_allocation(P, 'medium');   fd = fullfile(root, 'report', 'figures');   if ~isfolder(fd), mkdir(fd); end
-f9 = fullfile(root, 'results', 'stage9', 'run_medium.mat');   f8 = fullfile(root, 'results', 'stage8', 'run_medium.mat');
+X = load(fullfile(root, 'results', 'alloc_medium_22_siting.mat'));   al = X.alloc;      % siting allocation (6 interrogators in shelters)
+f9 = fullfile(root, 'results', 'stage9_siting', 'run_medium.mat');   f8 = fullfile(root, 'results', 'stage8', 'run_medium.mat');
 if isfile(f9), S = load(f9); else, S = load(f8); end
 E = S.E;   cam = twin3d_camera('overview');   th = getenv('TWIN_THEME');   if isempty(th), th = 'light'; end,   which = getenv('TWIN_WHICH');   res = 300;   if ~isempty(getenv('TWIN_RES')), res = str2double(getenv('TWIN_RES')); end   % one figure per MATLAB session (openGL)
 if isempty(which) || strcmp(which, 'overview')

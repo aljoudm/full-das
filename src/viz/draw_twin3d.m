@@ -78,9 +78,10 @@ if ~isempty(E)
     if ~isempty(o.ZoomExtent), inb = ll(:, 2) >= o.ZoomExtent(1) & ll(:, 2) <= o.ZoomExtent(2) & ll(:, 1) >= o.ZoomExtent(3) & ll(:, 1) <= o.ZoomExtent(4); else, inb = true(height(E), 1); end
     rsub = RandStream('Threefry', 'Seed', 5);   keep = false(height(E), 1);   idx = find(inb);   idx = idx(randperm(rsub, numel(idx), min(numel(idx), o.MaxIntruders)));   keep(idx) = true;   tot = [nnz(sel{1} & inb), nnz(sel{2} & inb), nnz(sel{3} & inb)];
     for k = 1:3
-        m = sel{k} & keep;   cnt(k) = nnz(m);   zz = zAt(ll(m, 2), ll(m, 1)) + 0.09;
+        m = sel{k} & keep;   cnt(k) = nnz(m);   zz = [zAt(ll(m, 2), ll(m, 1)) + 0.09; NaN];   ll = [ll; NaN NaN];   m = [m; true];   % NaN point: a class without events still gets a graphics handle
         if k < 3, H.int(k) = plot3(ax, tx(ll(m, 2)), ty(ll(m, 1)), zz, mk{k}, 'MarkerFaceColor', col{k}, 'MarkerEdgeColor', 'k', 'MarkerSize', 3.5);
         else, H.int(k) = plot3(ax, tx(ll(m, 2)), ty(ll(m, 1)), zz, mk{k}, 'Color', col{k}, 'LineWidth', 1.1, 'MarkerSize', 5); end
+        ll(end, :) = [];   m(end) = [];
     end
 end
 % ---- view

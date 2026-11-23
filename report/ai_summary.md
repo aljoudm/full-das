@@ -17,7 +17,7 @@ Source: `results/classifier/T1s/metrics.json` (window 1 s, ASSUMED), protocol `d
 * **Random vs grouped (diagnostic, window level, run once):** random 80/10/10 window split 0.750 against 0.623 on the grouped locked test: a gap of 12.7 points. Windows overlap and are not independent.
 * **What Brno can prove:** the largest class has 17 events with a 1 s window (all recordings); even if every one of them were classified correctly, the one-sided 95 % lower bound on recall is 0.05^(1/17) = **83.8 %**. In the locked test the best case is 0.652. So Brno shows that the classifier works on these data; **the real accuracy has to come from FEBUS** (a 98 % claim needs at least 149 error-free independent events per class).
 * **Climbing scored 0 of 7**: expected, because the training has only 2 climbing events from 2 recordings (momentary fence impacts); the result cannot tell a weak classifier from an unusual fence recording.
-* **Background (diagnostic, [DIAGNOSTIC - SAME RECORDING], same recording, optimistic):** 0 alarm-class events among 1 background events over 1.5e-05 km-days; the 17 s of the last 20 % prove nothing about false alarms. The operational rate needs at least 30 km-days of clean FEBUS background without a false alarm to show an upper bound of 0.1 per km per day.
+* **Background [DIAGNOSTIC - SAME RECORDING, optimistic]:** 0 alarm-class events among 1 background events over 1.5e-05 km-days; the 17 s of the last 20 % prove nothing about false alarms. The operational rate needs at least 30 km-days of clean FEBUS background without a false alarm to show an upper bound of 0.1 per km per day.
 * [DIAGNOSTIC - SAME RECORDING, optimistic] running: 2 events in the last 20 % of its only recording, recall 1.00.
 * [DIAGNOSTIC - SAME RECORDING, optimistic] digging: 2 events in the last 20 % of its only recording, recall 1.00.
 * [DIAGNOSTIC - SAME RECORDING, optimistic] tampering: 3 events in the last 20 % of its only recording, recall 0.33.
@@ -25,7 +25,7 @@ Source: `results/classifier/T1s/metrics.json` (window 1 s, ASSUMED), protocol `d
 
 **Window length sensitivity (2 s, `results/classifier/T2s/metrics.json`):** balanced accuracy 0.750 over 10 test events (1 s: 0.750 over 16); recall per class walking 1.00 (4 ev.), vehicle 1.00 (2 ev.), climbing 0.00 (1 ev.), other 1.00 (3 ev.). The base stays 1 s (chosen from event counts before training).
 
-**The base stub (Pc_DAS 0.983 to 0.993, literature) is ASSUMED** (table row `Pc_DAS`, value_type ASSUMED; reference wang2024 via Shao 2025). These literature figures usually come from random-window splits and are probably optimistic; our own evidence is the 12.7-point gap between a random-window split and the grouped locked test on Brno (diagnostic, window level, label: Brno). The optimization keeps these values.
+**The base stub (Pc_DAS 0.983 to 0.993, literature) is ASSUMED** (table row `Pc_DAS`, value_type ASSUMED; reference wang2024, as reported in Shao 2025). These literature figures usually come from random-window splits and are probably optimistic; our own evidence is the 12.7-point gap between a random-window split and the grouped locked test on Brno (diagnostic, window level, label: Brno). The optimization keeps these values.
 
 **Decision on the confusion matrix:** the uniform stub (Pc from the literature, 0.983 to 0.993) stays the BASE of the unified simulation. The Brno matrix (`results/classifier/T1s/confusion_matrix.csv`, counts) is a SENSITIVITY only, labelled "Brno, 4 test recordings, SENSITIVITY"; classes missing from it (running, digging, tampering, background, animal) fall back to the uniform stub (`config/ai_config.json`, mode `confusion_counts`). The optimization keeps the literature Pc_DAS.
 
@@ -42,10 +42,10 @@ Source: `results/reid/reid_grid.csv` (1,296 cells, 300 scenes per cell, 95 % sce
 
 | Camera | Cells below 0.97 | with pairs | with spacing 2 m or 1 m | with dropout 20 % | Person-level accuracy, median [min] | Group-level accuracy, median [min] | Accuracy of all decisions (person or group), median [min] |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| fixed camera, 1 m | 228 | 198 | 126 | 151 | 0.48 [0.15] | 0.51 [0.17] | 0.92 [0.60] |
-| drone, 1.5 m | 86 | 74 | 50 | 57 | 0.49 [0.24] | 0.54 [0.31] | 0.92 [0.65] |
-| drone, 2.5 m (base) | 98 | 86 | 57 | 60 | 0.42 [0.18] | 0.47 [0.23] | 0.92 [0.60] |
-| drone, 5 m | 121 | 97 | 69 | 72 | 0.34 [0.13] | 0.36 [0.15] | 0.92 [0.60] |
+| fixed camera, 1 m | 228 | 198 | 126 | 151 | 0.48 [0.15] | 0.51 [0.17] | 0.923 [0.604] |
+| drone, 1.5 m | 86 | 74 | 50 | 57 | 0.49 [0.24] | 0.54 [0.31] | 0.924 [0.652] |
+| drone, 2.5 m (base) | 98 | 86 | 57 | 60 | 0.42 [0.18] | 0.47 [0.23] | 0.919 [0.602] |
+| drone, 5 m | 121 | 97 | 69 | 72 | 0.34 [0.13] | 0.36 [0.15] | 0.918 [0.599] |
 
 Limits as conditions: **people walking in pairs, spacing of 2 m or less, camera dropout.** There the person-level claim does not hold and the operator relies on `ambiguous` and the group link.
 * Fixed cameras cover only 1.9 % of the boundary, so most links will be with the drone. An `ambiguous` link never sends a patrol to a specific person; a DAS-only track is an alarm and goes to the drone.
@@ -68,14 +68,17 @@ Limits as conditions: **people walking in pairs, spacing of 2 m or less, camera 
 
 ## 4. Height from gait and the along-the-boundary walk (label: SIMULATED, Stage 7; `results/stage7_height_share.csv`)
 
-| p_along (ASSUMED) | Walking | Along-boundary path | Height measurable, all intruders | of along-boundary paths | of crossing walkers | of all walkers |
+| p_along (ASSUMED) | Walking | Along-boundary path | Height measurable, as a share of ALL intruder events | of along-boundary paths | of crossing walkers | of all walkers (walking intruders only) |
 | --- | --- | --- | --- | --- | --- | --- |
 | 0 % | 49.7 % | 0.0 % | 0.0 % | n/a | 0.0 % | 0.0 % |
 | 10 % | 49.7 % | 4.7 % | 4.1 % | 88.1 % | 0.0 % | 8.3 % |
 | 30 % | 49.4 % | 15.2 % | 13.4 % | 87.9 % | 0.0 % | 27.0 % |
 
-A person crossing the fibre never qualifies (the height method needs a walk parallel to the fibre within 3 m with at least 8 footsteps and a detection SNR of at least 12 dB; the SNR condition never binds in simulation). Height is a secondary, exploratory indicator (+/- 8 cm); the primary claim of the DAS is stride, speed and cadence.
+**Denominators:** the 4th column is a share of ALL intruder events (4.1 % at p_along 10 %, 13.4 % at 30 %); the last column is a share of the intruders who WALK (about 8 % and 27 %; walkers are about half of all intruders, column 2). Same numerator, different denominators.
 
-## 5. Related system results (SIMULATED, Stage 6)
-* Medium scenario: 48.7 to 51.5 % of the Hot alarms verified within T_resp against 61 % of the Hot cells in the optimization: the static availability model is optimistic (it ignores the time a drone is busy, the charge and simultaneous alarms). Source: `report/key_numbers.md`.
-* Simulated Pd of the DAS 0.977 (intrusion types) next to the literature 0.969; it depends on the ASSUMED ground coupling and is not a measured Pd. Source: `tests/test_stage4.m`, `report/decisions.md`.
+A person crossing the fibre never qualifies (the height method needs a walk parallel to the fibre within 3 m with at least 8 footsteps and a detection SNR of at least 12 dB; the SNR condition never binds in simulation). Height is a secondary, exploratory indicator (+/- 8 cm, ASSUMED); the primary claim of the DAS is stride, speed and cadence.
+
+## 5. Related system results (SIMULATED, Stage 6 and 9)
+* **Main system limit (Stage 9, medium, siting model with 6 interrogators and the unified Pd(d) model):** 61.0 % of the intruders are NOT verified within T_resp = 300 s, even with a single verification (39.0 % [37.9, 40.0] are); before the siting model it was 62.9 % (63 % in the Stage 6 table above). The limit arises after the detection (the DAS detects 99.6 % of the intruders); Stage 6 attributes it to the time a drone is busy, the charge and simultaneous alarms. Source: `results/stage9_siting/metrics_summary.csv`, `report/stage9_siting_comparison.md`.
+* Medium scenario (Stage 6): 48.7 to 51.5 % of the Hot alarms verified within T_resp against 61 % of the Hot cells in the optimization: the static availability model is optimistic (it ignores the time a drone is busy, the charge and simultaneous alarms). Source: `report/key_numbers.md`.
+* Simulated Pd of the DAS: 0.996 over all intrusion types in the Stage 9 siting run (no event farther than 14.2 km optical distance), next to the literature 0.969 used by the optimization; it depends on the ASSUMED ground coupling and is not a measured Pd. Source: `results/siting/pd_model.mat`, `report/assumptions.md`.

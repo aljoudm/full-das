@@ -154,3 +154,9 @@ Rule (table row `siting_dstar_rule`, applied to the **type-mix Pd**, i.e. the av
 | Power: interrogators + shelter cooling | 680 + 680 = 1,360 W | 1,020 + 1,020 = 2,040 W | +680 W |
 
 The model has no operating cost in SAR, only the power draw (within the P0 budget in both). Drones (12 in the medium scenario) are the same in both models and are not part of C_total.
+
+## Stage 9 with the siting model, before / after (`report/stage9_siting_comparison.md`, `report/stage9_siting_results.md`, `results/stage9_siting/`; SIMULATED, seed 9090 = same common random numbers, 394 days, 10,004 events per scenario)
+* **DAS miss share by optical distance (medium):** before 0.00 % below 10 km, 5.8 % at 10-14.75 km, 12.2 % at 15-20 km; after 0.03 % (0-5 km), 0.30 % (5-10 km), 1.16 % (10-14.75 km), and no event farther than 14.23 km. Overall **Pd 95.8 % -> 99.6 %** (medium; low 96.4, high 95.9 before; 99.6 in all three after, because the three scenarios now have the same interrogators).
+* **Pd x Pc** 94.2 % -> 97.9 % (medium). **Verified within T_resp** (all intruders): medium 37.1 % -> 39.0 %, Hot zone 48.9 % -> 51.0 %; low 19.5 % -> 19.4 %; high 69.5 % -> 73.2 %. **Patrol reached:** medium 84.5 % -> 87.6 %, low 66.5 % -> 65.8 %, high 85.3 % -> 88.6 %. Median verification time (medium) 486 s -> 494 s.
+* **Intruders NOT verified within T_resp even with one verification (medium): 62.9 % before, 61.0 % after** (the 63 % of the Stage 6 table). The siting model fixes the DAS misses; the T_resp limit remains and is about the drone side, not the detection.
+* Cost: 4 -> 6 interrogators, 11,373,506 -> 12,654,986 SAR (+1,281,480). The Pd after the change is above the 0.969 assumed by the optimization because no event is farther than d* (14.75 km).
