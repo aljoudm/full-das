@@ -18,7 +18,7 @@ Part B: the result numbers below. The value column is read programmatically from
 | Checkpoint-room cost C_shelter_checkpoint | 30,000 SAR | ASSUMED | table row `C_shelter_checkpoint` | 25 % of C_shelter |
 | Shelter cost of the siting solution | 360,000 SAR (4 checkpoint rooms + 2 new cabins) | DERIVED | `results/siting/cost_with_shelters.csv` | `scripts/siting_cost_table.m` |
 | C_total, siting model | 13,014,986 SAR | SIMULATED (MILP) | `results/siting/cost_with_shelters.csv`; table row `C_total_siting` | interrogators 3,816,000 + sensing fibre 8,829,506 + lead-in 9,480 + shelters 360,000; C_DAS_int 636,000, C_fiber 60700 per km (table) |
-| C_total, main model (4 interrogators, no shelter cost) | 11,373,506 SAR | SIMULATED (frozen MILP f51b223) | `results/stage9_siting/comparison.csv` column C_total; `tests/test_stage2.m` | reproduces optimization/report/key_results.md; computed with C_shelter = 0 |
+| C_total, main model (4 interrogators) and siting model (6), as in the Stage 9 comparison | 11,853,506 SAR -> 13,014,986 SAR (with shelters; the main model without any shelter cost: 11,373,506) | SIMULATED (MILP) | `results/stage9_siting/comparison.csv` column C_total (regenerated with the shelters); `tests/test_stage2.m` | main model solved with C_shelter = 0 (reproduces optimization/report/key_results.md); its 4 cabins (new, 120,000 each) added |
 | Cabin price sensitivity (50,000 / 120,000 / 300,000 SAR) | 12,774,986 / 13,014,986 / 13,854,986 SAR, same N and sites | SIMULATED (MILP re-solved) | `results/siting/cost_with_shelters.csv` (cases medium_shello, medium_shelhi) | `scripts/siting_run_scn.m` with env SHEL, SHELCHK |
 | N = 5 forced | C_total 12,285,758 SAR; 4 cells (135 of 139 with DAS) uncovered | SIMULATED (MILP, Nfix = 5) | `results/siting/cost_with_shelters.csv`; `results/alloc_medium_22_siting_N5.mat` | `Siting.Nfix` option; difference to N = 6: 729,228 SAR |
 | d* = 13 km (weakest-type rule) | N = 7, C_total 13,963,473 SAR | SIMULATED (MILP) | `results/siting/cost_with_shelters.csv` (case medium_d13) | `scripts/siting_run_scn.m` DSTAR=13 |
@@ -35,11 +35,11 @@ Part B: the result numbers below. The value column is read programmatically from
 | Group sensitivity p_group 25 % / 50 % (persons) | 16,089 / 22,547 persons for 10,004 events | SIMULATED; p_group ASSUMED | `results/stage9_siting/metrics_summary.csv` |  |
 | Brno confusion matrix (SENSITIVITY only): Pc given detection | 58.4 % (base uniform stub 98.3 %) | SIMULATED; matrix from published dataset | `results/stage9_siting/metrics_summary.csv`; `config/ai_config.json` | base = uniform stub from Pc_DAS (ASSUMED); the matrix is a sensitivity |
 | Re-identification target 0.97 kept in the hard cells | NOT kept (see `report/reid_summary.md`) | SIMULATED, ASSUMED errors | `results/reid/summary.json`, `results/reid/reid_grid.csv` | 1296 cells x 300 scenes; design is Yomna's, run only through her protocol in `reid/` |
-| Number of table rows with status PLACEHOLDER or TBD | 28 | - | `report/final/OPEN_ITEMS.md` | listed one by one |
+| Number of table rows with status PLACEHOLDER or TBD | 29 | - | `report/final/OPEN_ITEMS.md` | listed one by one |
 | Not in this map: numbers of the AI summary | - | - | `report/final/ai_summary.md` | each has its own bib key (`report/references_additions.bib`) |
 | Numbers of the Stages 1-9 text in key_numbers.md | see file | SIMULATED / DERIVED | `report/key_numbers.md` | each section names its test or script (`tests/test_stage1.m` ... `tests/test_stage6.m`, `scripts/`); re-running the test reproduces the value |
 
 ## Notes
-* Costs: `results/stage9_siting/comparison.csv` still stores C_total = 12,654,986 for the siting model (the Stage 9 rerun was made before the shelter cost was added); the current cost is `results/siting/cost_with_shelters.csv` (13,014,986). The allocation did not change, so no Stage 9 result changed.
+* Costs: `results/stage9_siting/comparison.csv` was regenerated on 24 Nov 2026 with the shelters (main model 11,853,506 = 11,373,506 + 4 new cabins; siting 13,014,986). The allocation did not change, so no Stage 9 result changed.
 * All SIMULATED values depend on ASSUMED inputs (coupling spread, intruder rates, speeds); they are results of the model, not measurements. Phase 0 (field measurements) is where they would be replaced.
 * Frozen sources: see `third_party/PROVENANCE.md` for every repository, commit and date.

@@ -1,6 +1,6 @@
 # Final parameter table (single table of the project: `config/parameters_reviewed.tsv`; full 10-column copy in `parameters_final.tsv`)
 
-171 rows. Status counts: ASSUMED 79, PLACEHOLDER 17, TBD 11, مبدئي 10, مقترح 9, مفترض 9, معتمد 6, مفترض (مبني على مصدر) 5, SIMULATED 5, SOURCED 4, اقتراح 4, proxy 3, مختار في الريبو 2, توضيحي 2, مشكوك في امره للغايه جدا 1, اقتراح – المدى الفعلي حول مكة 1, مفترض (موزع، VERIFY) 1, ان شاء الله 1, decided 1.
+172 rows. Status counts: ASSUMED 79, PLACEHOLDER 17, TBD 11, مبدئي 10, مقترح 9, مفترض 9, معتمد 6, SIMULATED 6, مفترض (مبني على مصدر) 5, SOURCED 4, اقتراح 4, proxy 3, مختار في الريبو 2, توضيحي 2, مشكوك في امره للغايه جدا 1, اقتراح – المدى الفعلي حول مكة 1, مفترض (موزع، VERIFY) 1, ان شاء الله 1, decided 1.
 
 Status legend: PLACEHOLDER = a value kept only to let the model run, to be replaced by data or a quotation; ASSUMED = engineering assumption with no source; SIMULATED / DERIVED = computed by the model; the rest are sourced (the source column names it).
 
@@ -22,6 +22,7 @@ Status legend: PLACEHOLDER = a value kept only to let the model run, to be repla
 | `N_DAS_int` | 4 | units | مقترح | derived | [DERIVED] ceil(L_boundary ÷ (N_ch_active × R_DAS)) = ceil(145.47 ÷ 40) |
 | `L_channel` | 18.18 | km | مقترح | derived | [DERIVED] L_boundary ÷ (N_DAS_int × N_ch_active) |
 | `P_DAS_total` | 680 | W | مقترح | derived | [DERIVED] N_DAS_int × P_DAS |
+| `P_total_siting` | 2040 | W | SIMULATED | derived | [DERIVED] N_DAS_int_siting x (P_DAS + P_shelter); gsma_coolsure for the cooling share |
 | `P_shelter` | 170 | W | مفترض (مبني على مصدر) | assumption | gsma_coolsure: التبريد 30–50% من حمل الموقع ← 0.43 إلى 1.0 × P_DAS = 73 إلى 170 W |
 | `C_shelter` | 120000 | SAR/unit | PLACEHOLDER | placeholder | PLACEHOLDER: no published Saudi price found (searched 24 Nov 2026; only cabinet-AC installation 500 SAR, labour only). Order of magnitude for an air-conditioned |
 | `L_leadin` | 0 | m | مفترض | assumption | افتراض: الكابينة على الحد نفسه |

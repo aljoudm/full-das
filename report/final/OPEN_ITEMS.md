@@ -4,7 +4,7 @@
 | --- | --- | --- | --- |
 | `T_alert` | TBD | s |  |
 | `L_loc` | TBD | m | للعلم: الـ spatial resolution للجهاز من 1 إلى 50 m حسب الداتاشيت، فالرقم لازم يكون في هالمدى |
-| `C_shelter` | 120000 | SAR/unit | ناقصة: ما لقينا سعر. القيمة 0 تعني (ما انحسبت)، يعني C_total الحالي أقل من الحقيقي بمقدار 4 كبائن. تحتاج مصدر أو عرض سعر. قرار 22 نوفمبر |
+| `C_shelter` | 120000 | SAR/unit | [full-das 2026-11-24] 120,000 SAR per NEW cabin (road sites): PLACEHOLDER, needs a supplier quotation (no Saudi price found). Entrance checkpoints use C_shelter_checkpoint = 30,000 SAR (ASSUMED, exist |
 | `T_resp` | 300 | s | مرتبط بـ T_alert (لسا TBD عند الطالبة 1). الحساسية: 180 و600 s. قرار 22 نوفمبر |
 | `A_ver_min` | 0.9 | - | قيمة مؤقتة. الحساسية: 0.8 و0.95. قرار 22 نوفمبر |
 | `C_PS` | TBD | SAR/unit | ما تدخل في التغطية في هذي النسخة (موجودة عند المنافذ مع الكاميرات)، ومطفية بـ use_PS. قرار 21 نوفمبر |
@@ -30,3 +30,4 @@
 | `T_mission_s` | 900 | s | [full-das 2026-11-22] The optimization uses the steady-state availability A(n) (D8); the simulation uses the explicit state, so the two can differ. |
 | `T_patrol_busy_s` | 1800 | s | [full-das 2026-11-22]  |
 | `p_site_clear` | 0.99 | - | [full-das 2026-11-22] First run used Pc_CCTV = 0.85 for clearing: about 355 false patrol dispatches per day, not credible for guarded sites. |
+| `C_shelter_checkpoint` | 30000 | SAR/unit | [full-das 2026-11-24] Project lead 24 Nov 2026. Sensitivity 10-50 % of C_shelter. Needs a quotation for the equipment room. |

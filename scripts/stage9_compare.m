@@ -8,8 +8,9 @@ for k = 1:numel(sc)
         if v == 1, A = load(fullfile(root, 'results', ['alloc_' sc{k} '_22.mat'])); else, A = load(fullfile(root, 'results', ['alloc_' sc{k} '_22_siting.mat'])); end
         ia = A.alloc.interrogators;   lead = zeros(size(ia.arc_m(:)'));   if isfield(ia, 'leadin_m'), lead = ia.leadin_m(:)'; end
         sp = r.s(E.piece);   sp = sp(:);   d = abs(sp - ia.arc_m(:)');   d = min(d, L - d) + lead;   dist = min(d, [], 2);
+        Ct = A.alloc.C_total;   if v == 1, Ct = Ct + A.alloc.n_interrogators * P.v.C_shelter; end      % C_total WITH shelters: the siting allocation includes them; the main allocation was solved with C_shelter = 0, so its 4 cabins (all new, 120,000 each) are added
         M = compute_metrics(E, FA, T, P);   m = M.rows;
-        for q = 1:numel(mets), i = find(strcmp(m.metric, mets{q}), 1);   rows = [rows; table(string(sc{k}), string(dirn{v}), string(mets{q}), m.value(i), m.lo(i), m.hi(i), A.alloc.n_interrogators, A.alloc.C_total, FA.nDays, height(E), 'VariableNames', {'scenario', 'model', 'metric', 'value', 'lo', 'hi', 'n_interrogators', 'C_total', 'days', 'events'})]; end %#ok<AGROW>
+        for q = 1:numel(mets), i = find(strcmp(m.metric, mets{q}), 1);   rows = [rows; table(string(sc{k}), string(dirn{v}), string(mets{q}), m.value(i), m.lo(i), m.hi(i), A.alloc.n_interrogators, Ct, FA.nDays, height(E), 'VariableNames', {'scenario', 'model', 'metric', 'value', 'lo', 'hi', 'n_interrogators', 'C_total', 'days', 'events'})]; end %#ok<AGROW>
         for b = 1:numel(edges) - 1
             mk = dist >= edges(b) & dist < edges(b+1);   if ~any(mk), continue; end
             byd = [byd; table(string(sc{k}), string(dirn{v}), edges(b)/1e3, edges(b+1)/1e3, nnz(mk), 100 * mean(~E.detected(mk)), 'VariableNames', {'scenario', 'model', 'from_km', 'to_km', 'events', 'missed_pct'})]; end %#ok<AGROW>

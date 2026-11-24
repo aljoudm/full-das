@@ -8,7 +8,7 @@
 | `OPEN_ITEMS.md` | the rows that are still PLACEHOLDER or TBD |
 | `ai_summary.md` | summary of the AI part (classifier, re-identification, height) with its literature |
 | `assumptions.md`, `decisions.md` | why each assumption / design decision was taken |
-| `figures/` | final figures with `CAPTIONS.md` (3D light and dark, overview and zoom; siting map; Pd(d) curve; Stage 9 before / after; re-identification; 2D intruder map) |
+| `figures/` | final figures with `CAPTIONS.md` (3D light and dark, overview and zoom; siting map; Pd(d) curve; Stage 9 before / after; re-identification) |
 | `tables/` | the CSV / JSON files behind the numbers (cost with shelters, sites, Pd curve, d* rule, Stage 9 comparison) |
 
 Rebuild with `python scripts/make_final_package.py`. Everything is SIMULATED unless a row says it is sourced; frozen sources and commits are in `third_party/PROVENANCE.md`.

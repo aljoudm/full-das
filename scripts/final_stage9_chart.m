@@ -8,8 +8,8 @@ fig = figure('Color', 'w', 'Units', 'centimeters', 'Position', [2 2 16 8.4], 'In
 ax = axes(fig, 'Position', [0.08 0.30 0.40 0.62]);   hold(ax, 'on');   bins = {'0-5', '5-10', '10-14.75', '14.75-15', '15-20'};   bf = strcmp(D.model, 'stage9');   af = strcmp(D.model, 'stage9_siting');
 yb = D.missed_pct(bf);   ya = zeros(5, 1);   ya(1:3) = D.missed_pct(af);   ya(4:5) = NaN;                    % after the change no event is farther than 14.23 km: the bins above 14.75 km are empty
 bar(ax, (1:5) - 0.19, yb, 0.36, 'FaceColor', cb);   bar(ax, (1:3) + 0.19, ya(1:3), 0.36, 'FaceColor', ca);   set(ax, 'XTick', 1:5, 'XTickLabel', bins, 'FontSize', 6.5, 'XTickLabelRotation', 25);   xlabel(ax, 'distance from the interrogator [km]', 'FontSize', 7);   ylabel(ax, 'intruders missed by the DAS [%]', 'FontSize', 7);
-text(ax, 4.75, 21.3, {'after: no events beyond 14.23 km'}, 'FontSize', 6, 'Color', ca, 'HorizontalAlignment', 'center');
-legend(ax, {'before (4 interrogators)', 'after (6 sited)'}, 'FontSize', 6, 'Location', 'north', 'Box', 'off');   title(ax, 'DAS misses by distance', 'FontSize', 7.5);   grid(ax, 'on');
+text(ax, 4.5, 21.2, {'after: no events', 'beyond 14.23 km'}, 'FontSize', 6, 'Color', ca, 'HorizontalAlignment', 'center');
+legend(ax, {'before (4 interrogators)', 'after (6 sited)'}, 'FontSize', 6, 'Location', 'northwest', 'Box', 'off');   title(ax, 'DAS misses by distance', 'FontSize', 7.5);   grid(ax, 'on');
 ax2 = axes(fig, 'Position', [0.58 0.30 0.40 0.62]);   hold(ax2, 'on');   mets = {'Pd', 'Pd_x_Pc', 'verified_Tresp', 'patrol_reached'};   lab = {'Pd', 'Pd x Pc', 'verified in T_{resp}', 'patrol reached'};   vb = zeros(4, 1);   va = vb;
 for k = 1:4, vb(k) = 100 * C.value(strcmp(C.model, 'stage9') & strcmp(C.metric, mets{k}));   va(k) = 100 * C.value(strcmp(C.model, 'stage9_siting') & strcmp(C.metric, mets{k})); end
 bar(ax2, (1:4) - 0.19, vb, 0.36, 'FaceColor', cb);   bar(ax2, (1:4) + 0.19, va, 0.36, 'FaceColor', ca);   set(ax2, 'XTick', 1:4, 'XTickLabel', lab, 'FontSize', 6.5, 'XTickLabelRotation', 20);   ylabel(ax2, '[% of all intruders]', 'FontSize', 7);   ylim(ax2, [0 115]);   ylim(ax, [0 24]);

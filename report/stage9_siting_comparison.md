@@ -7,7 +7,7 @@ Before = `results/stage9` (4 interrogators at run midpoints, library lookup by t
 | | Before | After |
 | --- | --- | --- |
 | Interrogators | 4 | 6 |
-| C_total (SAR) | 11,373,506 | 12,654,986 |
+| C_total (SAR) | 11,853,506 | 13,014,986 |
 | Drones | unchanged (3 / 6 / 12) | unchanged |
 
 ## System metrics (95 % bootstrap intervals)

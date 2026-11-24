@@ -66,7 +66,6 @@ figs = [
     ("siting_map_medium.png", "results/siting/siting_map_medium.png", "2D map of the interrogator siting (d* = 14.75 km, N_min = 5, N = 6): candidates, chosen shelters, boundary coloured by the serving shelter. Same result in low and high."),
     ("pd_curve.png", "results/siting/pd_curve.png", "Pd against the optical distance with the monotone fit and its 95 % limits; d* = 14.75 km. SIMULATED."),
     ("stage9_before_after.png", "report/figures/stage9_before_after.png", "Stage 9 before / after the siting model (medium): DAS misses by distance, Pd, Pd x Pc, verified in T_resp, patrol reached. SIMULATED, same random numbers."),
-    ("map2d_intruders_medium_stage8.png", "report/figures/map2d_intruders_medium_stage8.png", "2D map of intruders, Stage 8 run (main model with 4 interrogators; kept for the numbers figures)."),
     ("reid_accuracy_vs_spacing.png", "results/reid/accuracy_vs_spacing.png", "Re-identification (DAS <-> camera) accuracy against the spacing of people (Yomna's protocol, SIMULATED)."),
 ]
 for dst, src, _ in figs:
@@ -89,7 +88,7 @@ for r in P:
     esc = lambda x: x.replace("|", "/").replace("\n", " ")
     md.append(f"| `{r[0]}` | {esc(r[3])} | {esc(r[4])} | {esc(r[7])} | {esc(r[9])} | {esc(r[5])[:160]} |")
 (OUT / "parameters_final.md").write_text("\n".join(md) + "\n", encoding="utf-8")
-open_items = [r for r in P if r[7].upper().startswith(("PLACEHOLDER", "TBD"))]
+open_items = [r for r in P if r[7].upper().startswith(("PLACEHOLDER", "TBD")) or r[0] == "C_shelter_checkpoint"]
 (OUT / "OPEN_ITEMS.md").write_text("# Values still PLACEHOLDER or TBD (need data, a quotation or a decision)\n\n| Symbol | Value | Unit | What is missing |\n| --- | --- | --- | --- |\n" +
                                   "\n".join(f"| `{r[0]}` | {r[3]} | {r[4]} | {r[8].split(' | ')[0][:200].replace('|', '/')} |" for r in open_items) + "\n", encoding="utf-8")
 
@@ -114,7 +113,8 @@ add("New-cabin cost C_shelter", f"{fnum(tv('C_shelter'))} SAR", par["C_shelter"]
 add("Checkpoint-room cost C_shelter_checkpoint", f"{fnum(tv('C_shelter_checkpoint'))} SAR", par["C_shelter_checkpoint"]["status"], "table row `C_shelter_checkpoint`", "25 % of C_shelter")
 add("Shelter cost of the siting solution", f"{fnum(m['shelters_SAR'])} SAR ({m['n_checkpoint_rooms']} checkpoint rooms + {m['n_new_cabins']} new cabins)", "DERIVED", "`results/siting/cost_with_shelters.csv`", "`scripts/siting_cost_table.m`")
 add("C_total, siting model", f"{fnum(m['C_total_SAR'])} SAR", "SIMULATED (MILP)", "`results/siting/cost_with_shelters.csv`; table row `C_total_siting`", f"interrogators {fnum(m['interrogators_SAR'])} + sensing fibre {fnum(m['sensing_fibre_SAR'])} + lead-in {fnum(m['leadin_fibre_SAR'])} + shelters {fnum(m['shelters_SAR'])}; C_DAS_int {fnum(tv('C_DAS_int'))}, C_fiber {tv('C_fiber')} per km (table)")
-add("C_total, main model (4 interrogators, no shelter cost)", f"{fnum([x for x in cmp_ if x['model']=='stage9' and x['scenario']=='medium'][0]['C_total'])} SAR", "SIMULATED (frozen MILP f51b223)", "`results/stage9_siting/comparison.csv` column C_total; `tests/test_stage2.m`", "reproduces optimization/report/key_results.md; computed with C_shelter = 0")
+add("C_total, main model (4 interrogators) and siting model (6), as in the Stage 9 comparison", f"{fnum([x for x in cmp_ if x['model']=='stage9' and x['scenario']=='medium'][0]['C_total'])} SAR -> {fnum([x for x in cmp_ if x['model']=='stage9_siting' and x['scenario']=='medium'][0]['C_total'])} SAR (with shelters; the main model without any shelter cost: 11,373,506)", "SIMULATED (MILP)", "`results/stage9_siting/comparison.csv` column C_total (regenerated with the shelters); `tests/test_stage2.m`", "main model solved with C_shelter = 0 (reproduces optimization/report/key_results.md); its 4 cabins (new, 120,000 each) added"
+)
 add("Cabin price sensitivity (50,000 / 120,000 / 300,000 SAR)", f"{fnum(cost['medium_shello']['C_total_SAR'])} / {fnum(m['C_total_SAR'])} / {fnum(cost['medium_shelhi']['C_total_SAR'])} SAR, same N and sites", "SIMULATED (MILP re-solved)", "`results/siting/cost_with_shelters.csv` (cases medium_shello, medium_shelhi)", "`scripts/siting_run_scn.m` with env SHEL, SHELCHK")
 add("N = 5 forced", f"C_total {fnum(cost['medium_N5']['C_total_SAR'])} SAR; 4 cells (135 of 139 with DAS) uncovered", "SIMULATED (MILP, Nfix = 5)", "`results/siting/cost_with_shelters.csv`; `results/alloc_medium_22_siting_N5.mat`", "`Siting.Nfix` option; difference to N = 6: " + fnum(float(m['C_total_SAR']) - float(cost['medium_N5']['C_total_SAR'])) + " SAR")
 add("d* = 13 km (weakest-type rule)", f"N = {cost['medium_d13']['N']}, C_total {fnum(cost['medium_d13']['C_total_SAR'])} SAR", "SIMULATED (MILP)", "`results/siting/cost_with_shelters.csv` (case medium_d13)", "`scripts/siting_run_scn.m` DSTAR=13")
@@ -147,7 +147,7 @@ for n, v, t, f, h in S:
     e = lambda x: str(x).replace("|", "/")
     lines.append(f"| {e(n)} | {e(v)} | {e(t)} | {e(f)} | {e(h)} |")
 lines += ["", "## Notes",
-          "* Costs: `results/stage9_siting/comparison.csv` still stores C_total = 12,654,986 for the siting model (the Stage 9 rerun was made before the shelter cost was added); the current cost is `results/siting/cost_with_shelters.csv` (13,014,986). The allocation did not change, so no Stage 9 result changed.",
+          "* Costs: `results/stage9_siting/comparison.csv` was regenerated on 24 Nov 2026 with the shelters (main model 11,853,506 = 11,373,506 + 4 new cabins; siting 13,014,986). The allocation did not change, so no Stage 9 result changed.",
           "* All SIMULATED values depend on ASSUMED inputs (coupling spread, intruder rates, speeds); they are results of the model, not measurements. Phase 0 (field measurements) is where they would be replaced.",
           "* Frozen sources: see `third_party/PROVENANCE.md` for every repository, commit and date."]
 (OUT / "SOURCE_MAP.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
@@ -170,7 +170,7 @@ print("package built:", OUT, "| parameter rows", len(P), "| PLACEHOLDER", len(op
 | `OPEN_ITEMS.md` | the rows that are still PLACEHOLDER or TBD |
 | `ai_summary.md` | summary of the AI part (classifier, re-identification, height) with its literature |
 | `assumptions.md`, `decisions.md` | why each assumption / design decision was taken |
-| `figures/` | final figures with `CAPTIONS.md` (3D light and dark, overview and zoom; siting map; Pd(d) curve; Stage 9 before / after; re-identification; 2D intruder map) |
+| `figures/` | final figures with `CAPTIONS.md` (3D light and dark, overview and zoom; siting map; Pd(d) curve; Stage 9 before / after; re-identification) |
 | `tables/` | the CSV / JSON files behind the numbers (cost with shelters, sites, Pd curve, d* rule, Stage 9 comparison) |
 
 Rebuild with `python scripts/make_final_package.py`. Everything is SIMULATED unless a row says it is sourced; frozen sources and commits are in `third_party/PROVENANCE.md`.
