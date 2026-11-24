@@ -45,8 +45,11 @@ end
 cs = A.sites([A.sites.in]);   isCp = string({cs.kind}) == "checkpoint";   cll = @(s) deal(r.lon0 + [s.x] / r.kx, r.lat0 + [s.y] / r.ky);
 [lo, la] = cll(cs(~isCp));   H.cam = plot3(ax, tx(lo), ty(la), zAt(lo, la) + 0.03, 'o', 'MarkerFaceColor', [0.1 0.8 1], 'MarkerEdgeColor', 'k', 'MarkerSize', 4);
 [lo, la] = cll(cs(isCp));    H.cp = plot3(ax, tx(lo), ty(la), zAt(lo, la) + 0.05, 'd', 'MarkerFaceColor', [0.2 1 0.4], 'MarkerEdgeColor', 'k', 'MarkerSize', 7);
-ia = alloc.interrogators;   H.iu = plot3(ax, tx(ia.lon), ty(ia.lat), zAt(ia.lon, ia.lat) + 0.06, 's', 'MarkerFaceColor', 'w', 'MarkerEdgeColor', 'k', 'LineWidth', 1, 'MarkerSize', 8);
-if isfield(ia, 'site_lon'), plot3(ax, tx(ia.site_lon), ty(ia.site_lat), zAt(ia.site_lon, ia.site_lat) + 0.08, 's', 'MarkerFaceColor', [1 1 0.6], 'MarkerEdgeColor', 'k', 'LineWidth', 1, 'MarkerSize', 7); end
+ia = alloc.interrogators;   ns = numel(ia.arc_m);   if isfield(ia, 'site_lon'), slo = ia.site_lon;   sla = ia.site_lat; else, slo = ia.lon;   sla = ia.lat; end      % ONE symbol per interrogator, at its shelter (lead-in of 50-200 m is below the symbol size)
+isChkI = false(ns, 1);   if isfield(ia, 'cand'), isChkI = string({ia.cand.kind})' == "checkpoint"; end
+H.iu = plot3(ax, tx(slo(~isChkI)), ty(sla(~isChkI)), zAt(slo(~isChkI), sla(~isChkI)) + 0.08, 's', 'MarkerFaceColor', 'w', 'MarkerEdgeColor', 'k', 'LineWidth', 1, 'MarkerSize', 8);
+H.iuc = plot3(ax, tx(slo(isChkI)), ty(sla(isChkI)), zAt(slo(isChkI), sla(isChkI)) + 0.08, 's', 'MarkerFaceColor', 'w', 'MarkerEdgeColor', [0.1 0.8 0.2], 'LineWidth', 2.2, 'MarkerSize', 8);
+H.n_interrogators = nnz(~isChkI) + nnz(isChkI);   assert(H.n_interrogators == ns, 'draw_twin3d: interrogator count');
 st3 = alloc.drones.station_xy;   dla = r.lat0 + st3(:, 2) / r.ky;   dlo = r.lon0 + st3(:, 1) / r.kx;   zg = zAt(dlo, dla);   zu = zg + 1.2;     % drone stations: altitude NOT to scale
 for i = 1:numel(dla), plot3(ax, tx(dlo(i)) * [1 1], ty(dla(i)) * [1 1], [zg(i) zu(i)], '-', 'Color', [0.55 0.2 0.9], 'LineWidth', 0.8); end
 H.uav = plot3(ax, tx(dlo), ty(dla), zu, '^', 'MarkerFaceColor', [0.65 0.3 1], 'MarkerEdgeColor', 'w', 'MarkerSize', 8);
@@ -65,9 +68,10 @@ end
 if o.Names
     for i = find(isCp)
         xx = tx(r.lon0 + cs(i).x / r.kx);   yy = ty(r.lat0 + cs(i).y / r.ky);   ha = 'left';   dx = 0.25;   dy = 0;
-        if xx > 12, ha = 'right';   dx = -0.25; end,   if contains(string(cs(i).name), "Sharaye"), dx = 0.3;   dy = 1.2;   ha = 'left'; end,   if contains(string(cs(i).name), "Hada"), dy = -1.3; end,   if contains(string(cs(i).name), "Nawariyah"), dy = 1.6;   dx = -1.0;   ha = 'right'; end                % Al-Sharaye: above the fibre, not on it
+        if xx > 12, ha = 'right';   dx = -0.25; end,   if contains(string(cs(i).name), "Sharaye"), dx = 0.4;   dy = 1.7;   ha = 'left'; end,   if contains(string(cs(i).name), "Hada"), dy = -1.4;   dx = -0.8; end,   if contains(string(cs(i).name), "Shumaisi") && contains(lower(string(cs(i).name)), "old"), dx = 0.9;   dy = -3.1;   ha = 'left'; end,   if contains(string(cs(i).name), "Shumaisi") && contains(lower(string(cs(i).name)), "new"), dx = 0.3;   dy = -2.6;   ha = 'left'; end,   if contains(string(cs(i).name), "Nawariyah"), dy = 1.6;   dx = -1.0;   ha = 'right'; end                % Al-Sharaye: above the fibre, not on it
         zc0 = zAt(r.lon0 + cs(i).x / r.kx, r.lat0 + cs(i).y / r.ky);   if abs(dy) > 0.5 || abs(dx) > 0.5, plot3(ax, [xx xx + dx], [yy yy + dy], [zc0 + 0.05 zc0 + 0.25], 'k-', 'LineWidth', 0.5); end
-        text(ax, xx + dx, yy + dy, zc0 + 0.25, char(cs(i).name), 'FontSize', 5.5, 'FontWeight', 'bold', 'BackgroundColor', [1 1 1 0.8], 'Margin', 0.3, 'Interpreter', 'none', 'HorizontalAlignment', ha);
+        nmTxt = char(cs(i).name);   if contains(lower(nmTxt), 'shumaisi old'), nmTxt = 'Al-Shumaisi old'; end      % short name: the long one runs into the fibre / is hidden by the ridge
+        text(ax, xx + dx, yy + dy, zc0 + 0.25, nmTxt, 'FontSize', 5.5, 'FontWeight', 'bold', 'BackgroundColor', [1 1 1 0.8], 'Margin', 0.3, 'Interpreter', 'none', 'HorizontalAlignment', ha);
     end
 end
 % ---- intruders of a simulated run
@@ -96,9 +100,9 @@ text(ax, x0 + L / 2, y0, zb + 0.3, sprintf('%d km', L), 'FontSize', 6, 'FontWeig
 ov = axes(fig, 'Position', [0 0 1 1], 'Visible', 'off', 'XLim', [0 1], 'YLim', [0 1]);   hold(ov, 'on');
 patch(ov, mapW * [0.94 0.92 0.96], [0.955 0.90 0.90] - 0.0, 'w', 'EdgeColor', 'k');   text(ov, mapW * 0.94, 0.975, 'N', 'FontWeight', 'bold', 'FontSize', 8, 'HorizontalAlignment', 'center', 'Color', tc);
 patch(ov, [0 mapW mapW 0], [0 0 0.07 0.07], o.BG, 'EdgeColor', 'none');   text(ov, 0.005, 0.035, 'Imagery: Esri, Vantor, Earthstar Geographics, and the GIS User Community. Terrain: Copernicus DEM GLO-30 (vertical exaggeration x' + string(VE) + ').' + newline + 'Data: OpenStreetMap contributors.', 'FontSize', 4.5, 'Color', tc, 'VerticalAlignment', 'middle', 'Interpreter', 'none');
-ent = {'Cold zone fibre', 'Neutral zone fibre', 'Hot zone fibre', 'DAS interrogator', 'Drone station (n drones)', 'Entrance checkpoint', 'Existing camera site'};
+ent = {'Cold zone fibre', 'Neutral zone fibre', 'Hot zone fibre', 'DAS interrogator in a new shelter', 'Drone station (n drones)', 'Entrance checkpoint', 'Existing camera site'};
 sty = {{'.', zc(1, :)}, {'.', zc(2, :)}, {'.', zc(3, :)}, {'s', [1 1 1]}, {'^', [0.65 0.3 1]}, {'d', [0.2 1 0.4]}, {'o', [0.1 0.8 1]}};
-if isfield(ia, 'site_lon'), ent = [ent(1:4), {'Interrogator shelter'}, ent(5:end)];   sty = [sty(1:4), {{'s', [1 1 0.6]}}, sty(5:end)]; end
+if any(isChkI), ent = [ent(1:4), {'DAS interrogator at a checkpoint'}, ent(5:end)];   sty = [sty(1:4), {{'S', [1 1 1]}}, sty(5:end)]; end          % 'S' = white square with a green edge
 if ~isempty(E), ent = [ent, {sprintf('Verified in T_{resp} (%d/%d)', cnt(1), tot(1)), sprintf('Detected, late (%d/%d)', cnt(2), tot(2)), sprintf('Missed by DAS (%d/%d)', cnt(3), tot(3))}];
     sty = [sty, {{'o', [0.1 0.85 0.2]}, {'s', [1 0.6 0]}, {'x', [1 0 1]}}]; end
 H.legend_entries = ent;
@@ -108,6 +112,7 @@ if sideLegend
         yy = y1 - (i - 0.5) * dy;
         if sty{i}{1} == '.', plot(ov, mapW + 0.02, yy, '.', 'Color', sty{i}{2}, 'MarkerSize', 14);
         elseif sty{i}{1} == 'x', plot(ov, mapW + 0.02, yy, 'x', 'Color', sty{i}{2}, 'LineWidth', 1.4, 'MarkerSize', 6);
+        elseif sty{i}{1} == 'S', plot(ov, mapW + 0.02, yy, 's', 'MarkerFaceColor', 'w', 'MarkerEdgeColor', [0.1 0.8 0.2], 'LineWidth', 1.8, 'MarkerSize', 5);
         else, plot(ov, mapW + 0.02, yy, sty{i}{1}, 'MarkerFaceColor', sty{i}{2}, 'MarkerEdgeColor', 'k', 'MarkerSize', 5); end
         text(ov, mapW + 0.045, yy, ent{i}, 'FontSize', 5.6, 'Color', tc, 'VerticalAlignment', 'middle');
     end

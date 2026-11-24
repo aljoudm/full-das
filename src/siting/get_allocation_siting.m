@@ -19,7 +19,8 @@ if isempty(o.DStarKm), J = jsondecode(fileread(fullfile(root, 'results', 'siting
 Nmin = ceil(P.v.L_boundary_m / 1e3 / (2 * dstar));
 c = T.cells;   runLam = zeros(numel(c.runs.cell), 1);                       % expected intruders per day on every run: cell rate (Cold 1-2, Neutral 8-10, Hot 11-20 per zone, spread by risk x length) x share of the cell length on the run
 for r = 1:numel(runLam), runLam(r) = T.lambda.mid(c.runs.cell(r)) * c.runs.len(r) / c.L_m(c.runs.cell(r)); end
-S = struct('cand', C, 'dstar_m', dstar * 1e3, 'Nmin', Nmin, 'RunWeights', runLam);   if ~isempty(o.Nfix), S.Nfix = o.Nfix; end
+isChk = strcmp({C.kind}, 'checkpoint');   shelCost = P.v.C_shelter * ones(numel(C), 1);   shelCost(isChk) = P.fd.C_shelter_checkpoint;      % new cabin at a road site, cheaper room at an existing checkpoint building
+S = struct('cand', C, 'dstar_m', dstar * 1e3, 'Nmin', Nmin, 'RunWeights', runLam, 'ShelterCost', shelCost);   if ~isempty(o.Nfix), S.Nfix = o.Nfix; end
 if isfile(f) && ~o.Force, X = load(f);   alloc = X.alloc;   fprintf('get_allocation_siting: loaded %s\n', f);   return; end
 oldp = fullfile(root, 'third_party', 'optimization', 'src');   newp = fullfile(root, 'third_party', 'optimization_siting', 'src');
 rmpath(oldp);   addpath(newp);   cleanup = onCleanup(@() swap_path(newp, oldp));

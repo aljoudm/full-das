@@ -1,6 +1,6 @@
 % TEST_STAGE2  Allocation through the FROZEN run_optimization with the full-das table. Must match the optimization report.
 addpath(fullfile(fileparts(mfilename('fullpath')), '..', 'src'));   root = setup_paths();
-P = load_params_fd();   fprintf('--- Stage 2 tests ---\n');
+P = load_params_fd();   P.v.C_shelter = 0;   fprintf('--- Stage 2 tests ---\n');
 scen = {'low', 'medium', 'high'};   expHot = [9 22 34];   expDr = [3 6 12];
 for k = 1:3
     [al, cells] = get_allocation(P, scen{k});
@@ -25,3 +25,4 @@ end
 fprintf('independent check: %d of %d verified Hot cells (medium) have a station reaching the whole cell within R_resp = %.0f m\n', ok, al.hot_verified, P.v.R_resp_m);
 assert(ok >= al.hot_verified - 0, 'independent verification count');
 fprintf('Stage 2: ALL PASSED\n');
+% note: P.v.C_shelter = 0 reproduces the frozen report numbers, which were computed WITHOUT a cabin cost (table row C_shelter was 0 until 24 Nov 2026)
