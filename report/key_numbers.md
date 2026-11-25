@@ -216,3 +216,39 @@ DAS miss share (medium, final layout): 0.03 % (0-5 km), 0.30 % (5-10 km), 1.16 %
 | high | C dual in Neutral+Cold | 0.189 [0.186, 0.193] | 256 s | 504 s | 85.7 % [85.0, 86.4] | 44.2 % (11.2/day) / 23.7 % | 43.5 % |
 
 **Conclusion for the medium scenario: it still holds.** Dual verification everywhere (B) lowers the false patrols from 0.227 to 0.195 per km per day (14 % less; the 95 % intervals do not overlap, but the value stays about 20 times the target FAR_km = 0.01), while the share of true alarms that reach a patrol falls from 88.5 % to 60.4 % (28 points), the median verification time rises from 490 s to 1,252 s and intruders not verified within T_resp rise from 61 % to 87 %. Option C (dual only in Neutral and Cold) lowers the false patrols as much as B (0.195) with a smaller loss (69.5 % patrol reached) but still 19 points below A. The base stays the single check. The reduction in false patrols is a little larger than in the earlier run (0 to 13 %) because the final model has more detections; the wording "barely reduces" should read "reduces by about 14 %". Low and high show the same pattern (patrol reached A -> B: low 66.4 -> 38.1 %, high 89.5 -> 78.9 %).
+
+## Baselines on the final model (24-25 Nov 2026; `scripts/baselines_final.m`, `results/baselines_final/`; definitions of decision D12 of the optimization repo)
+**Baseline 1, existing assets only (cameras, no DAS; drones verify, they do not detect). STATIC** (`baseline1_existing_assets_only.csv`): it does not depend on the interrogators or the drone layout, so it equals the optimization report.
+
+| Zone | Cells | Boundary covered by cameras | Cell Pd min / mean / max | Cells meeting AD0 | Intruder-weighted expected detection |
+| --- | ---: | ---: | --- | ---: | ---: |
+| Hot | 36 | 0.00 % | 0.000 / 0.000 / 0.000 | 0 | 0.00 % |
+| Neutral | 56 | 1.04 % | 0.000 / 0.011 / 0.165 | 0 | 0.83 % |
+| Cold | 47 | 4.56 % | 0.000 / 0.047 / 0.192 | 0 | 3.50 % |
+| All | 139 | 1.90 % | 0.000 / 0.020 / 0.192 | 0 | 0.49 % |
+
+With the final design the simulated Pd is 99.6 % (Stage 9 final); with the existing assets only the expected share of intruders detected is 0.49 % (a static expectation: cell intrusion rate x camera coverage x Pd_CCTV; no Monte Carlo of a camera-only chain was run).
+
+**Baseline 2, the same drones spread evenly (not optimised).** Same drone numbers (3 / 6 / 12). *Static* = Hot cells with a verification layer (`baseline2_even_drones_static.csv`). *Monte Carlo* = final Stage 9 configuration (seed 9090, 394 days, 10,004 intruders, common random numbers), only the drone stations change (`baseline2_even_drones_montecarlo.csv`); the control (optimal stations through the same code path) reproduces `results/stage9_siting_final` to 8e-16. All SIMULATED. Pd is the same in every layout (detection does not depend on drones).
+
+| Scenario | Layout | Stations | Hot cells verified (static) | Verified in T_resp, all / Hot | Patrol reached (of true alarms) | Median verification | Median alarm-to-patrol | False patrols per km per day |
+| --- | --- | ---: | ---: | --- | ---: | ---: | ---: | ---: |
+| low | Optimal (final design) | 2 | 9 / 36 (25 %) | 19.4 % / 24.1 % | 66.4 % | 1,001 s | 1,669 s | 0.221 |
+| low | 2: pairs, even on the boundary | 2 | 0 / 36 (0 %) | 9.6 % / 8.0 % | 66.2 % | 981 s | 1,740 s | 0.220 |
+| low | 2b: pairs, even over the candidate stations | 2 | 0 / 36 (0 %) | 1.3 % / 0.0 % | 67.7 % | 774 s | 1,381 s | 0.221 |
+| low | 2c: best phase of the even boundary layout | 2 | 9 / 36 (25 %) | 14.6 % / 17.2 % | 65.7 % | 1,002 s | 1,641 s | 0.221 |
+| low | singles, even on the boundary | 3 | 0 / 36 (0 %) | 11.9 % / 9.1 % | 67.5 % | 929 s | 1,494 s | 0.221 |
+| medium | Optimal (final design) | 3 | 22 / 36 (61 %) | 38.9 % / 51.0 % | 88.5 % | 490 s | 674 s | 0.227 |
+| medium | 2: pairs, even on the boundary | 3 | 7 / 36 (19 %) | 22.0 % / 18.0 % | 88.5 % | 708 s | 900 s | 0.227 |
+| medium | 2b: pairs, even over the candidate stations | 3 | 2 / 36 (6 %) | 10.1 % / 8.4 % | 88.5 % | 521 s | 723 s | 0.227 |
+| medium | 2c: best phase of the even boundary layout | 3 | 16 / 36 (44 %) | 32.8 % / 40.6 % | 88.5 % | 550 s | 683 s | 0.227 |
+| medium | singles, even on the boundary | 6 | 0 / 36 (0 %) | 29.6 % / 24.6 % | 88.8 % | 429 s | 627 s | 0.227 |
+| high | Optimal (final design) | 6 | 34 / 36 (94 %) | 73.0 % / 92.2 % | 89.5 % | 218 s | 409 s | 0.227 |
+| high | 2: pairs, even on the boundary | 6 | 12 / 36 (33 %) | 41.3 % / 34.8 % | 89.5 % | 347 s | 512 s | 0.227 |
+| high | 2b: pairs, even over the candidate stations | 6 | 22 / 36 (61 %) | 58.4 % / 61.6 % | 89.5 % | 269 s | 440 s | 0.227 |
+| high | 2c: best phase of the even boundary layout | 6 | 25 / 36 (69 %) | 58.3 % / 67.2 % | 89.5 % | 256 s | 451 s | 0.227 |
+| high | singles, even on the boundary | 12 | 0 / 36 (0 %) | 84.6 % / 84.0 % | 89.5 % | 157 s | 318 s | 0.227 |
+
+**Where an even layout beats the optimal one in the Monte Carlo** (only differences whose 95 % intervals do not overlap):
+* high, verified in T_resp, all: layout singles is above the optimal one, 84.6 % [83.9, 85.4] against 73.0 % [72.1, 73.9].
+* **Reading:** the optimal layout is the best in the Hot cells in every scenario. In high, however, one drone per station (12 stations) verifies more intruders overall (84.6 % against 73.0 %) and faster (median 157 s against 218 s), while it verifies fewer Hot-cell intruders (84.0 % against 92.2 %). The static criterion gives that layout 0 Hot cells (one drone has a ready probability of 0.635 < A_ver_min = 0.9), so the static criterion of the optimization and the simulation do not rank the layouts the same way: the optimization maximises Hot cells under the steady-state rule, not the overall share verified in time. This is a limitation to state in the report.

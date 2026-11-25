@@ -1,0 +1,16 @@
+scenario,layout,drones,stations,Hot_cells_verified,Hot_cells,Hot_verified_pct,cells_verified,cells,intrusion_rate_in_verified_cells_pct
+low,optimal,3,2,9,36,25,16,139,17.401131501731
+low,even_boundary_2,3,2,0,36,0,9,139,3.13662085436949
+low,even_candidates_2b,3,2,0,36,0,0,139,0
+low,even_best_phase_2c,3,2,9,36,25,13,139,16.7401291511198
+low,even_singles,3,3,0,36,0,0,139,0
+medium,optimal,6,3,22,36,61.1111111111111,42,139,42.9557724632056
+medium,even_boundary_2,6,3,7,36,19.4444444444444,34,139,19.6756070399444
+medium,even_candidates_2b,6,3,2,36,5.55555555555556,12,139,8.01523088340695
+medium,even_best_phase_2c,6,3,16,36,44.4444444444444,33,139,34.1122868922563
+medium,even_singles,6,6,0,36,0,0,139,0
+high,optimal,12,6,34,36,94.4444444444444,77,139,73.3283942841737
+high,even_boundary_2,12,6,12,36,33.3333333333333,59,139,38.9825497627061
+high,even_candidates_2b,12,6,22,36,61.1111111111111,65,139,54.3612919591318
+high,even_best_phase_2c,12,6,25,36,69.4444444444444,68,139,56.7246729873629
+high,even_singles,12,12,0,36,0,0,139,0

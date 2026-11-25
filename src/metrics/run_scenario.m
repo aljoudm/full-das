@@ -11,6 +11,7 @@ setenv('AI_CLASSIFIER_MODE', mode);   cleanup = onCleanup(@() setenv('AI_CLASSIF
 [al, ~, A] = get_allocation(P, scenario);   opts = struct('pdmodel', false);
 if isfield(P, 'sim') && isfield(P.sim, 'siting') && P.sim.siting, X = load(fullfile(fileparts(fileparts(fileparts(mfilename('fullpath')))), 'results', sprintf('alloc_%s_22_siting.mat', scenario)));   al = X.alloc;   end     % siting allocation (sites with lead-in)
 if isfield(P, 'sim') && isfield(P.sim, 'pdmodel'), opts.pdmodel = P.sim.pdmodel; end
+if isfield(P, 'sim') && isfield(P.sim, 'drones'), al.drones.station_xy = P.sim.drones.station_xy;   al.drones.n = P.sim.drones.n(:); end      % optional: replace the drone layout (baselines); the response uses only these two fields
 G = gen_setup(T, TP, P, A);
 Es = {};   fa = zeros(0, 5);   n = 0;   d = 0;
 while n < minIntruders || d < 20
