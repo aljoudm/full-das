@@ -200,3 +200,19 @@ The final design is the allocation of `results/alloc_<scenario>_22_siting.mat` a
 | high | 99.6 % | 97.9 % | 73.0 % / 92.2 % | 88.6 % | 218 s | 409 s | 0.227 |
 
 DAS miss share (medium, final layout): 0.03 % (0-5 km), 0.30 % (5-10 km), 1.16 % (10-14.75 km), no event beyond 14.23 km: unchanged, because detection does not depend on the drones. The conclusions of the first siting run (Pd above 0.969, the T_resp limit is on the drone side) stand; the numbers above replace the earlier ones for the final design.
+
+## Single versus dual verification - final model (`report/final/stage6_dual_siting.md`; `results/stage6_dual_siting.csv`; SIMULATED, 394 days, seed 9090, option A = `results/stage9_siting_final`)
+
+| Scenario | Option | False patrols per km per day [95 % CI] | Median verification time | Median alarm-to-patrol | Patrol reached (share of true alarms) [95 % CI] | Intruders NOT verified within T_resp (all / Hot) | True alarms verified later than T_resp |
+| --- | --- | --- | ---: | ---: | --- | --- | ---: |
+| low | A single check | 0.221 [0.217, 0.225] | 1,001 s | 1,669 s | 66.4 % [65.5, 67.3] | 80.6 % (20.5/day) / 75.9 % | 73.8 % |
+| medium | A single check | 0.227 [0.223, 0.231] | 490 s | 674 s | 88.5 % [87.8, 89.1] | 61.1 % (15.5/day) / 49.0 % | 60.2 % |
+| high | A single check | 0.227 [0.223, 0.231] | 218 s | 409 s | 89.5 % [88.9, 90.1] | 27.0 % (6.9/day) / 7.8 % | 26.3 % |
+| low | B dual everywhere | 0.202 [0.199, 0.206] | 1,309 s | 1,736 s | 38.1 % [37.2, 38.9] | 92.2 % (23.4/day) / 90.9 % | 82.3 % |
+| medium | B dual everywhere | 0.195 [0.192, 0.199] | 1,252 s | 1,428 s | 60.4 % [59.5, 61.4] | 87.5 % (22.2/day) / 84.5 % | 82.8 % |
+| high | B dual everywhere | 0.186 [0.183, 0.189] | 485 s | 652 s | 78.9 % [78.1, 79.7] | 62.4 % (15.8/day) / 52.6 % | 61.4 % |
+| low | C dual in Neutral+Cold | 0.202 [0.198, 0.206] | 1,230 s | 1,680 s | 42.6 % [41.6, 43.5] | 89.1 % (22.6/day) / 85.9 % | 77.3 % |
+| medium | C dual in Neutral+Cold | 0.195 [0.192, 0.199] | 981 s | 1,150 s | 69.5 % [68.6, 70.4] | 78.9 % (20.0/day) / 70.1 % | 73.5 % |
+| high | C dual in Neutral+Cold | 0.189 [0.186, 0.193] | 256 s | 504 s | 85.7 % [85.0, 86.4] | 44.2 % (11.2/day) / 23.7 % | 43.5 % |
+
+**Conclusion for the medium scenario: it still holds.** Dual verification everywhere (B) lowers the false patrols from 0.227 to 0.195 per km per day (14 % less; the 95 % intervals do not overlap, but the value stays about 20 times the target FAR_km = 0.01), while the share of true alarms that reach a patrol falls from 88.5 % to 60.4 % (28 points), the median verification time rises from 490 s to 1,252 s and intruders not verified within T_resp rise from 61 % to 87 %. Option C (dual only in Neutral and Cold) lowers the false patrols as much as B (0.195) with a smaller loss (69.5 % patrol reached) but still 19 points below A. The base stays the single check. The reduction in false patrols is a little larger than in the earlier run (0 to 13 %) because the final model has more detections; the wording "barely reduces" should read "reduces by about 14 %". Low and high show the same pattern (patrol reached A -> B: low 66.4 -> 38.1 %, high 89.5 -> 78.9 %).
