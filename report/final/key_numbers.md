@@ -165,7 +165,38 @@ For a like-for-like comparison, the main model with its four interrogators house
 The model has no operating cost in SAR, only the power draw (within the P0 budget in both). Drones (12 in the medium scenario) are the same in both models and are not part of C_total.
 
 ## Stage 9 with the siting model, before / after (`report/stage9_siting_comparison.md`, `report/stage9_siting_results.md`, `results/stage9_siting/`; SIMULATED, seed 9090 = same common random numbers, 394 days, 10,004 events per scenario)
+
+> **Superseded:** these numbers were computed with the earlier drone layout (commit a83a877). The final design uses the re-solved drone stations; see the heading "Stage 9 siting - final drone layout" at the end of this file.
 * **DAS miss share by optical distance (medium):** before 0.00 % below 10 km, 5.8 % at 10-14.75 km, 12.2 % at 15-20 km; after 0.03 % (0-5 km), 0.30 % (5-10 km), 1.16 % (10-14.75 km), and no event farther than 14.23 km. Overall **Pd 95.8 % -> 99.6 %** (medium; low 96.4, high 95.9 before; 99.6 in all three after, because the three scenarios now have the same interrogators).
 * **Pd x Pc** 94.2 % -> 97.9 % (medium). **Verified within T_resp** (all intruders): medium 37.1 % -> 39.0 %, Hot zone 48.9 % -> 51.0 %; low 19.5 % -> 19.4 %; high 69.5 % -> 73.2 %. **Patrol reached:** medium 84.5 % -> 87.6 %, low 66.5 % -> 65.8 %, high 85.3 % -> 88.6 %. Median verification time (medium) 486 s -> 494 s.
 * **Intruders NOT verified within T_resp even with one verification (medium): 62.9 % before, 61.0 % after** (the 63 % of the Stage 6 table). The siting model fixes the DAS misses; the T_resp limit remains and is about the drone side, not the detection.
 * Cost (`results/stage9_siting/comparison.csv`, regenerated 24 Nov 2026 WITH the shelters): 4 -> 6 interrogators, 11,853,506 -> 13,014,986 SAR (+1,161,480). The 11,853,506 is the main model's 11,373,506 plus its four interrogators in new cabins (4 x 120,000); without any shelter cost the figures are 11,373,506 and 12,654,986. The allocation (N and sites) did not change with the shelter cost, so no Stage 9 result changed.
+
+## Stage 9 siting - final drone layout (SIMULATED; `results/stage9_siting_final/`, `report/final/figures/stage9_before_after_v2.png`)
+The final design is the allocation of `results/alloc_<scenario>_22_siting.mat` as re-solved on 24 Nov 2026 with the shelter cost (C_total 13,014,986 SAR). Same six interrogators and sites as before; **the drone stations moved** (the last MILP stage chooses among equal-cost layouts), so Stage 9 was re-run on this layout: 394 days, seed 9090, 10,004 intruder events per case, common random numbers, same code as the first siting run (`scripts/stage9_run.m` with `STAGE9_OUT=stage9_siting_final`). Comparison files: `results/stage9_siting_final/comparison.csv`, `comparison_by_distance.csv`, `reid_in_simulation.csv`, `metrics_summary.csv`.
+
+**Medium scenario, earlier drone layout (commit a83a877) against the final one:**
+
+| Metric | Earlier layout | Final layout |
+| --- | ---: | ---: |
+| Pd | 99.6 % | 99.6 % |
+| Pd x Pc | 97.9 % | 97.9 % |
+| Verified within T_resp (all) | 39.0 % | 38.9 % |
+| Verified within T_resp (Hot cells) | 51.0 % | 51.0 % |
+| Patrol reached (of all intruders) | 87.6 % | 87.6 % |
+| Patrol reached (of true alarms) | 88.4 % | 88.5 % |
+| Median verification time | 494 s | 490 s |
+| Median alarm-to-patrol time | 675 s | 674 s |
+| False patrols per km per day | 0.227 | 0.227 |
+
+**Low and high:** low is identical to the first run in every metric (the low drone layout did not move). High: verified within T_resp 73.2 % -> 73.0 %, median verification time 202 s -> 218 s, median alarm-to-patrol 403 s -> 409 s; Pd, Pd x Pc and false patrols are identical (they do not depend on the drones).
+
+**All three scenarios, final layout:**
+
+| Scenario | Pd | Pd x Pc | Verified in T_resp (all / Hot) | Patrol reached (of all) | Median verification | Median alarm-to-patrol | False patrols per km per day |
+| --- | ---: | ---: | --- | ---: | ---: | ---: | ---: |
+| low | 99.6 % | 97.9 % | 19.4 % / 24.1 % | 65.8 % | 1,001 s | 1,669 s | 0.221 |
+| medium | 99.6 % | 97.9 % | 38.9 % / 51.0 % | 87.6 % | 490 s | 674 s | 0.227 |
+| high | 99.6 % | 97.9 % | 73.0 % / 92.2 % | 88.6 % | 218 s | 409 s | 0.227 |
+
+DAS miss share (medium, final layout): 0.03 % (0-5 km), 0.30 % (5-10 km), 1.16 % (10-14.75 km), no event beyond 14.23 km: unchanged, because detection does not depend on the drones. The conclusions of the first siting run (Pd above 0.969, the T_resp limit is on the drone side) stand; the numbers above replace the earlier ones for the final design.

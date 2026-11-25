@@ -4,7 +4,7 @@
 % medium with group intrusions p_group = 25 % and 50 % (ASSUMED sensitivities).
 addpath(fullfile(fileparts(mfilename('fullpath')), '..', 'src'));   root = setup_paths();
 minN = 10000;   seed = 9090;   outn = getenv('STAGE9_OUT');   if isempty(outn), outn = 'stage9'; end,   if ~isfolder(fullfile(root, 'results', outn)), mkdir(fullfile(root, 'results', outn)); end
-P = load_params_fd();   if strcmp(outn, 'stage9_siting'), P.sim = struct('siting', true, 'pdmodel', true); end,   T = load_twin(P);   TP = terrain_pieces(T, P);   lib = build_das_library(P);   % siting allocations (6 shelters, lead-in) + the unified Pd(d) model; same seed (common random numbers) as the base run
+P = load_params_fd();   if startsWith(outn, 'stage9_siting'), P.sim = struct('siting', true, 'pdmodel', true); end,   T = load_twin(P);   TP = terrain_pieces(T, P);   lib = build_das_library(P);   % siting allocations (6 shelters, lead-in) + the unified Pd(d) model; same seed (common random numbers) as the base run
 cases = {'low', 'uniform', 0; 'medium', 'uniform', 0; 'high', 'uniform', 0; 'medium', 'confusion_counts', 0; 'medium', 'uniform', 0.25; 'medium', 'uniform', 0.5};
 names = {'low', 'medium', 'high', 'medium_BrnoMatrix_SENSITIVITY', 'medium_pgroup25_SENSITIVITY', 'medium_pgroup50_SENSITIVITY'};
 if isempty(gcp('nocreate')), cl = parcluster('Processes');   cl.NumWorkers = 6;   parpool(cl, 6); end

@@ -4,7 +4,8 @@ addpath(fullfile(fileparts(mfilename('fullpath')), '..', 'src'));   root = setup
 sc = {'low', 'medium', 'high'};   mets = {'Pd', 'Pd_x_Pc', 'verified_Tresp', 'verified_Tresp_hot', 'patrol_reached', 'median_verification_s'};   rows = table();   byd = table();   edges = [0 5 10 14.75 15 20 30]*1e3;
 for k = 1:numel(sc)
     for v = 1:2
-        dirn = {'stage9', 'stage9_siting'};   X = load(fullfile(root, 'results', dirn{v}, ['run_' sc{k} '.mat']));   E = X.E;   FA = X.FA;
+        sitDir = getenv('STAGE9_SITING_DIR');   if isempty(sitDir), sitDir = 'stage9_siting'; end      % env STAGE9_SITING_DIR: results folder of the siting run (default the first run; 'stage9_siting_final' = final drone layout)
+        dirn = {'stage9', sitDir};   X = load(fullfile(root, 'results', dirn{v}, ['run_' sc{k} '.mat']));   E = X.E;   FA = X.FA;
         if v == 1, A = load(fullfile(root, 'results', ['alloc_' sc{k} '_22.mat'])); else, A = load(fullfile(root, 'results', ['alloc_' sc{k} '_22_siting.mat'])); end
         ia = A.alloc.interrogators;   lead = zeros(size(ia.arc_m(:)'));   if isfield(ia, 'leadin_m'), lead = ia.leadin_m(:)'; end
         sp = r.s(E.piece);   sp = sp(:);   d = abs(sp - ia.arc_m(:)');   d = min(d, L - d) + lead;   dist = min(d, [], 2);
@@ -16,4 +17,4 @@ for k = 1:numel(sc)
             byd = [byd; table(string(sc{k}), string(dirn{v}), edges(b)/1e3, edges(b+1)/1e3, nnz(mk), 100 * mean(~E.detected(mk)), 'VariableNames', {'scenario', 'model', 'from_km', 'to_km', 'events', 'missed_pct'})]; end %#ok<AGROW>
     end
 end
-od = fullfile(root, 'results', 'stage9_siting');   writetable(rows, fullfile(od, 'comparison.csv'));   writetable(byd, fullfile(od, 'comparison_by_distance.csv'));   disp(rows(rows.scenario == "medium", :));   disp(byd(byd.scenario == "medium", :));
+od = fullfile(root, 'results', sitDir);   writetable(rows, fullfile(od, 'comparison.csv'));   writetable(byd, fullfile(od, 'comparison_by_distance.csv'));   disp(rows(rows.scenario == "medium", :));   disp(byd(byd.scenario == "medium", :));

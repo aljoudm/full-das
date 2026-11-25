@@ -34,11 +34,11 @@ end
 rows.label = repmat("SIMULATED", height(rows), 1);   rows.false_patrols_per_day = rows.false_patrols_per_km_day * km;
 writetable(rows, fullfile(root, 'results', 'stage6_dual_siting.csv'));   disp(rows(:, {'scenario', 'option', 'days', 'false_patrols_per_km_day', 'median_verification_s', 'median_alarm_to_patrol_s', 'patrol_reached_of_true_alarms', 'not_verified_in_Tresp_all', 'not_verified_in_Tresp_hot', 'true_alarms_verified_late'}));
 % ---- check: option A equals the Stage 9 siting run (same seed, same days, same configuration)
-S9 = readtable(fullfile(root, 'results', 'stage9_siting', 'metrics_summary.csv'));   mx = 0;
+S9 = readtable(fullfile(root, 'results', 'stage9_siting_final', 'metrics_summary.csv'));   mx = 0;
 for s = 1:3
     a = rows(rows.scenario == scn{s} & rows.option == "A", :);   q = S9(strcmp(S9.run_case, scn{s}), :);
     for pair = {{'verified_Tresp', 1 - a.not_verified_in_Tresp_all}, {'patrol_reached_of_alarms', a.patrol_reached_of_true_alarms}, {'fa_patrol', a.false_patrols_per_km_day}, {'median_verification_s', a.median_verification_s}}
         v0 = q.value(strcmp(q.metric, pair{1}{1}));   mx = max(mx, abs(v0 - pair{1}{2}) / max(abs(v0), eps));
     end
 end
-fprintf('option A versus results/stage9_siting: largest relative difference %.2e\n', mx);   assert(mx < 1e-9, 'option A differs from the Stage 9 siting run');
+fprintf('option A versus results/stage9_siting_final: largest relative difference %.2e\n', mx);   assert(mx < 1e-9, 'option A differs from the final Stage 9 siting run');
