@@ -252,3 +252,12 @@ With the final design the simulated Pd is 99.6 % (Stage 9 final); with the exist
 **Where an even layout beats the optimal one in the Monte Carlo** (only differences whose 95 % intervals do not overlap):
 * high, verified in T_resp, all: layout singles is above the optimal one, 84.6 % [83.9, 85.4] against 73.0 % [72.1, 73.9].
 * **Reading:** the optimal layout is the best in the Hot cells in every scenario. In high, however, one drone per station (12 stations) verifies more intruders overall (84.6 % against 73.0 %) and faster (median 157 s against 218 s), while it verifies fewer Hot-cell intruders (84.0 % against 92.2 %). The static criterion gives that layout 0 Hot cells (one drone has a ready probability of 0.635 < A_ver_min = 0.9), so the static criterion of the optimization and the simulation do not rank the layouts the same way: the optimization maximises Hot cells under the steady-state rule, not the overall share verified in time. This is a limitation to state in the report.
+
+## T_resp sensitivity, final model (`results/tresp_sensitivity.csv`, `scripts/tresp_sensitivity.m`; SIMULATED)
+Share of real intruders verified within T_resp, computed from the stored verification times of `results/stage9_siting_final/run_<scenario>.mat` (394 days, 10,004 intruders; no new Monte Carlo). Denominators: all intruders (including DAS misses and non-alarms) / Hot-cell intruders. **Only the threshold changes:** the dispatch, the drone busy times and the drone layout (optimised for T_resp = 300 s) are those of the 300 s run. The 300 s row equals the Stage 9 final numbers.
+
+| Scenario | T_resp = 120 s (all / Hot) | 180 s | 300 s (base) | 600 s |
+| --- | --- | --- | --- | --- |
+| low | 7.4 % / 8.7 % | 11.3 % / 13.7 % | 19.4 % / 24.1 % | 27.6 % / 33.2 % |
+| medium | 14.2 % / 18.5 % | 23.8 % / 32.0 % | 38.9 % / 51.0 % | 55.5 % / 63.3 % |
+| high | 18.4 % / 21.1 % | 31.4 % / 38.6 % | 73.0 % / 92.2 % | 89.0 % / 93.4 % |
