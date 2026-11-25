@@ -165,7 +165,54 @@ For a like-for-like comparison, the main model with its four interrogators house
 The model has no operating cost in SAR, only the power draw (within the P0 budget in both). Drones (12 in the medium scenario) are the same in both models and are not part of C_total.
 
 ## Stage 9 with the siting model, before / after (`report/stage9_siting_comparison.md`, `report/stage9_siting_results.md`, `results/stage9_siting/`; SIMULATED, seed 9090 = same common random numbers, 394 days, 10,004 events per scenario)
+
+> **Superseded:** these numbers were computed with the earlier drone layout (commit a83a877). The final design uses the re-solved drone stations; see the heading "Stage 9 siting - final drone layout" at the end of this file.
 * **DAS miss share by optical distance (medium):** before 0.00 % below 10 km, 5.8 % at 10-14.75 km, 12.2 % at 15-20 km; after 0.03 % (0-5 km), 0.30 % (5-10 km), 1.16 % (10-14.75 km), and no event farther than 14.23 km. Overall **Pd 95.8 % -> 99.6 %** (medium; low 96.4, high 95.9 before; 99.6 in all three after, because the three scenarios now have the same interrogators).
 * **Pd x Pc** 94.2 % -> 97.9 % (medium). **Verified within T_resp** (all intruders): medium 37.1 % -> 39.0 %, Hot zone 48.9 % -> 51.0 %; low 19.5 % -> 19.4 %; high 69.5 % -> 73.2 %. **Patrol reached:** medium 84.5 % -> 87.6 %, low 66.5 % -> 65.8 %, high 85.3 % -> 88.6 %. Median verification time (medium) 486 s -> 494 s.
 * **Intruders NOT verified within T_resp even with one verification (medium): 62.9 % before, 61.0 % after** (the 63 % of the Stage 6 table). The siting model fixes the DAS misses; the T_resp limit remains and is about the drone side, not the detection.
 * Cost (`results/stage9_siting/comparison.csv`, regenerated 24 Nov 2026 WITH the shelters): 4 -> 6 interrogators, 11,853,506 -> 13,014,986 SAR (+1,161,480). The 11,853,506 is the main model's 11,373,506 plus its four interrogators in new cabins (4 x 120,000); without any shelter cost the figures are 11,373,506 and 12,654,986. The allocation (N and sites) did not change with the shelter cost, so no Stage 9 result changed.
+
+## Stage 9 siting - final drone layout (SIMULATED; `results/stage9_siting_final/`, `report/final/figures/stage9_before_after_v2.png`)
+The final design is the allocation of `results/alloc_<scenario>_22_siting.mat` as re-solved on 24 Nov 2026 with the shelter cost (C_total 13,014,986 SAR). Same six interrogators and sites as before; **the drone stations moved** (the last MILP stage chooses among equal-cost layouts), so Stage 9 was re-run on this layout: 394 days, seed 9090, 10,004 intruder events per case, common random numbers, same code as the first siting run (`scripts/stage9_run.m` with `STAGE9_OUT=stage9_siting_final`). Comparison files: `results/stage9_siting_final/comparison.csv`, `comparison_by_distance.csv`, `reid_in_simulation.csv`, `metrics_summary.csv`.
+
+**Medium scenario, earlier drone layout (commit a83a877) against the final one:**
+
+| Metric | Earlier layout | Final layout |
+| --- | ---: | ---: |
+| Pd | 99.6 % | 99.6 % |
+| Pd x Pc | 97.9 % | 97.9 % |
+| Verified within T_resp (all) | 39.0 % | 38.9 % |
+| Verified within T_resp (Hot cells) | 51.0 % | 51.0 % |
+| Patrol reached (of all intruders) | 87.6 % | 87.6 % |
+| Patrol reached (of true alarms) | 88.4 % | 88.5 % |
+| Median verification time | 494 s | 490 s |
+| Median alarm-to-patrol time | 675 s | 674 s |
+| False patrols per km per day | 0.227 | 0.227 |
+
+**Low and high:** low is identical to the first run in every metric (the low drone layout did not move). High: verified within T_resp 73.2 % -> 73.0 %, median verification time 202 s -> 218 s, median alarm-to-patrol 403 s -> 409 s; Pd, Pd x Pc and false patrols are identical (they do not depend on the drones).
+
+**All three scenarios, final layout:**
+
+| Scenario | Pd | Pd x Pc | Verified in T_resp (all / Hot) | Patrol reached (of all) | Median verification | Median alarm-to-patrol | False patrols per km per day |
+| --- | ---: | ---: | --- | ---: | ---: | ---: | ---: |
+| low | 99.6 % | 97.9 % | 19.4 % / 24.1 % | 65.8 % | 1,001 s | 1,669 s | 0.221 |
+| medium | 99.6 % | 97.9 % | 38.9 % / 51.0 % | 87.6 % | 490 s | 674 s | 0.227 |
+| high | 99.6 % | 97.9 % | 73.0 % / 92.2 % | 88.6 % | 218 s | 409 s | 0.227 |
+
+DAS miss share (medium, final layout): 0.03 % (0-5 km), 0.30 % (5-10 km), 1.16 % (10-14.75 km), no event beyond 14.23 km: unchanged, because detection does not depend on the drones. The conclusions of the first siting run (Pd above 0.969, the T_resp limit is on the drone side) stand; the numbers above replace the earlier ones for the final design.
+
+## Single versus dual verification - final model (`report/final/stage6_dual_siting.md`; `results/stage6_dual_siting.csv`; SIMULATED, 394 days, seed 9090, option A = `results/stage9_siting_final`)
+
+| Scenario | Option | False patrols per km per day [95 % CI] | Median verification time | Median alarm-to-patrol | Patrol reached (share of true alarms) [95 % CI] | Intruders NOT verified within T_resp (all / Hot) | True alarms verified later than T_resp |
+| --- | --- | --- | ---: | ---: | --- | --- | ---: |
+| low | A single check | 0.221 [0.217, 0.225] | 1,001 s | 1,669 s | 66.4 % [65.5, 67.3] | 80.6 % (20.5/day) / 75.9 % | 73.8 % |
+| medium | A single check | 0.227 [0.223, 0.231] | 490 s | 674 s | 88.5 % [87.8, 89.1] | 61.1 % (15.5/day) / 49.0 % | 60.2 % |
+| high | A single check | 0.227 [0.223, 0.231] | 218 s | 409 s | 89.5 % [88.9, 90.1] | 27.0 % (6.9/day) / 7.8 % | 26.3 % |
+| low | B dual everywhere | 0.202 [0.199, 0.206] | 1,309 s | 1,736 s | 38.1 % [37.2, 38.9] | 92.2 % (23.4/day) / 90.9 % | 82.3 % |
+| medium | B dual everywhere | 0.195 [0.192, 0.199] | 1,252 s | 1,428 s | 60.4 % [59.5, 61.4] | 87.5 % (22.2/day) / 84.5 % | 82.8 % |
+| high | B dual everywhere | 0.186 [0.183, 0.189] | 485 s | 652 s | 78.9 % [78.1, 79.7] | 62.4 % (15.8/day) / 52.6 % | 61.4 % |
+| low | C dual in Neutral+Cold | 0.202 [0.198, 0.206] | 1,230 s | 1,680 s | 42.6 % [41.6, 43.5] | 89.1 % (22.6/day) / 85.9 % | 77.3 % |
+| medium | C dual in Neutral+Cold | 0.195 [0.192, 0.199] | 981 s | 1,150 s | 69.5 % [68.6, 70.4] | 78.9 % (20.0/day) / 70.1 % | 73.5 % |
+| high | C dual in Neutral+Cold | 0.189 [0.186, 0.193] | 256 s | 504 s | 85.7 % [85.0, 86.4] | 44.2 % (11.2/day) / 23.7 % | 43.5 % |
+
+**Conclusion for the medium scenario: it still holds.** Dual verification everywhere (B) lowers the false patrols from 0.227 to 0.195 per km per day (14 % less; the 95 % intervals do not overlap, but the value stays about 20 times the target FAR_km = 0.01), while the share of true alarms that reach a patrol falls from 88.5 % to 60.4 % (28 points), the median verification time rises from 490 s to 1,252 s and intruders not verified within T_resp rise from 61 % to 87 %. Option C (dual only in Neutral and Cold) lowers the false patrols as much as B (0.195) with a smaller loss (69.5 % patrol reached) but still 19 points below A. The base stays the single check. The reduction in false patrols is a little larger than in the earlier run (0 to 13 %) because the final model has more detections; the wording "barely reduces" should read "reduces by about 14 %". Low and high show the same pattern (patrol reached A -> B: low 66.4 -> 38.1 %, high 89.5 -> 78.9 %).
